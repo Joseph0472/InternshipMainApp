@@ -26,8 +26,6 @@ const companyReducer = (state = [], action) => {
 
     switch(type) {
         case CREATE_COMPANY:
-        console.log(state)
-        // console.log(payload)
             return [...state, {
                 companyName: payload.companyName,
                 cPersonName: payload.cPersonName,
@@ -69,8 +67,11 @@ const companyReducer = (state = [], action) => {
             console.log("state: ", state)
             return state.push.apply(state,payload.filedata);
         case SET_COMPANIES:
-            console.log(state) //list of companies in db
-            return [...state, action.payload]
+            // console.log("set company state:", state) //list of companies in db
+            // console.log("payload: ", action.payload)
+            // console.log(state)
+            // console.log("return",[...state, action.payload])
+            return action.payload
         case LOAD_COMPANIES_LOADING:
             return com_loading(state, action);
         case LOAD_COMPANIES_SUCCESS:
@@ -100,31 +101,32 @@ function com_loaderr(state, action) {
 
 export const saveCom = () => async (dispatch, getState) => {
     const companies = getState().company
+    const index = companies.length - 1
+    console.log(companies)
     //TODO: Companies with same name should be not allowed to add
     await fetch(config.serverUrl+"/api/company/", {
         method: "POST",
         headers: {
             "Content-type": 'application/json'
         },
-        body: JSON.stringify(companies[1])
-    })
-    alert("Company added")
+        body: JSON.stringify(companies[index])
+    }).then(alert("Company added"))
     //TODO: FIX the adding companies error when adding consecutively
 
 }
 
 export const loadCom = () => async (dispatch, getState) => {
     const companies = await fetch(config.serverUrl+"/api/company/").then(res => res.json())
+    console.log(companies)
     dispatch(setCom(companies))
     return companies
 }
 
-export const delCom = (id) => (dispatch, getState) => {
-    console.log(id)
+export const delCom = (id) => async (dispatch, getState) => {
+    // console.log("deleting id: ", id)
     fetch(config.serverUrl+"/api/company/"+id, {
         method: "DELETE"
-    })
-    alert("Company removed")
-    //TODO: RELOAD the companies to maintain the new state
+    }).then(alert("Company removed"))
+    //TODO: RELOAD the companies to maintain the new state DONE
 }
 

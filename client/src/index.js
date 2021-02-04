@@ -22,6 +22,7 @@ import { createStore, applyMiddleware } from 'redux';
 import rootReducer from './redux/reducers/rootReducer'
 import { Provider } from 'react-redux'
 import thunk from 'redux-thunk'
+import { composeWithDevTools } from 'redux-devtools-extension'
 
 // core components
 import Admin from "layouts/Admin.js";
@@ -30,7 +31,7 @@ import "assets/css/material-dashboard-react.css?v=1.9.0";
 
 const hist = createBrowserHistory();
 
-const store = createStore(rootReducer, applyMiddleware(thunk));
+const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
 
 ReactDOM.render(
   <Provider store={store}>

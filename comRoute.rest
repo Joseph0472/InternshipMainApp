@@ -1,11 +1,10 @@
+### Get All Company
 GET http://localhost:10000/api/company/
 
-###
+### Get One
+GET http://localhost:10000/api/company/60193aa79927e71098ebb2e4
 
-GET http://localhost:10000/api/6017f5ada7ab67112cce7971
-
-###
-
+### Create One
 POST http://localhost:10000/api/company/
 Content-Type: application/json
 
@@ -21,5 +20,5 @@ Content-Type: application/json
     "interest3": 8 
     }
 
-###
+### Delete One
 DELETE http://localhost:10000/api/company/60195e8cd3e914495070c2ee

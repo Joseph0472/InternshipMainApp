@@ -4,8 +4,6 @@ import addEventRoutes from './events';
 import { PythonShell } from 'python-shell';
 import { Company } from '../../models/schema'
 const router = express.Router();
-
-
 // addTodoRoutes(router);
 // addEventRoutes(router);
 
@@ -23,7 +21,7 @@ router.get('/company/', async (req, res) => {
 })
 
 //Getting one
-router.get('/:id', getCompany, (req, res) => {
+router.get('/company/:id', getCompany, (req, res) => {
     res.json(res.company)
 })
 
@@ -67,7 +65,7 @@ router.delete('/company/:id', getCompany, async (req, res) => {
     }
 })
 
-// //Connect to py script
+// //Connect to Py script
 // const {spawn} = require('child_process');
 // const childPy = spawn('python', ['D:\\CodeStuff\\InternMainProject\\Forecasting\\mainapp\\server\\api-routes\\hi.py'])
 
@@ -95,6 +93,5 @@ async function getCompany(req, res, next) {
     res.company = company
     next()
 }
-
 
 export default router;

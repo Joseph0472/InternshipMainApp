@@ -239,10 +239,13 @@ export default function TableList() {
 
   const addCompany = (ndata) => {
     dispatch(addCom(ndata))
+    dispatch(saveCom())
+    dispatch(loadCom())
   }
 
   const deleteCompany = (comList, index) => {
     dispatch(deleteCom(comList, index))
+    dispatch(delCom(comList[index]._id))
   }
 
   const updateCompany = (ndata) => {
@@ -271,7 +274,10 @@ export default function TableList() {
   };
 
   useEffect(() => {
-    fetchCom() 
+    console.log(data[0])
+    if (!data[0]) {
+      fetchCom() 
+    }
   },[])
 
   //test
@@ -280,7 +286,7 @@ export default function TableList() {
   }
 
   const fetchCom = async () => {
-    const company = await dispatch(loadCom()) 
+    const company = await dispatch(loadCom())
     setData(company)
   }
 
@@ -305,7 +311,6 @@ export default function TableList() {
             setTimeout(() => {
               setData([...data, newData]);
               addCompany(newData);
-              dispatch(saveCom())
               resolve();
             }, 1000)
           }),
@@ -327,9 +332,7 @@ export default function TableList() {
               const index = oldData.tableData.id;
               dataDelete.splice(index, 1);
               setData([...dataDelete]);
-              console.log(state)
               deleteCompany(state ,index);
-              dispatch(delCom(state[0][index]._id))
               resolve()
             }, 1000)
           }),

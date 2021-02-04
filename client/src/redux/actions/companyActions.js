@@ -36,13 +36,14 @@ export const deleteCom = (comList, index) => {
     return {
         type: DELETE_COMPANY,
         payload: {
-          id: comList[0][index]._id,
-          companyName: comList[0][index].companyName,
+          id: comList[index]._id,
+          companyName: comList[index].companyName,
         }
     }
 }
 
 export const updateCom = (ndata) => {
+    console.log("updating")
     return {
         type: "UPDATE_COMPANY",
         payload: {
