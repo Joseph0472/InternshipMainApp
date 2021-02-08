@@ -1,11 +1,9 @@
 import {
-    LOAD_COMPANIES_LOADING,
-    LOAD_COMPANIES_SUCCESS,
-    LOAD_COMPANIES_ERROR,
     CREATE_COMPANY,
     SET_COMPANIES,
     DELETE_COMPANY,
-    UPDATE_COMPANY
+    UPDATE_COMPANY,
+    ADD_COM_VIA_EXCEL
 } from '../actions/action-types'
 import companyApi from '../../api/company'
 import config from '../../config'
@@ -27,6 +25,7 @@ const companyReducer = (state = [], action) => {
 
     switch(type) {
         case CREATE_COMPANY:
+        // console.log(state) ////state is a array of company object
             return [...state, {
                 companyName: payload.companyName,
                 cPersonName: payload.cPersonName,
@@ -47,7 +46,7 @@ const companyReducer = (state = [], action) => {
         case UPDATE_COMPANY:
             const dataUpdate = [...state];
             const index = payload.index;
-            console.log(payload) 
+            // console.log(payload) 
             //console.log([...state][index])
             dataUpdate[index] = {
                 companyName: payload.companyName,
@@ -61,9 +60,11 @@ const companyReducer = (state = [], action) => {
                 interest3: payload.interest3,
             }
             return [...dataUpdate];
-        case "ADD_COM_VIA_EXCEL":
+        case ADD_COM_VIA_EXCEL:
             console.log("pl data: ", payload.filedata)
             console.log("state: ", state)
+            //console.log(state.push.apply(state,payload.filedata))
+
             return state.push.apply(state,payload.filedata);
         case SET_COMPANIES:
             // console.log("set company state:", state) //list of companies in db
@@ -71,12 +72,6 @@ const companyReducer = (state = [], action) => {
             // console.log(state)
             // console.log("return",[...state, action.payload])
             return action.payload
-        case LOAD_COMPANIES_LOADING:
-            return com_loading(state, action);
-        case LOAD_COMPANIES_SUCCESS:
-            return com_loaded(state, action);
-        case LOAD_COMPANIES_ERROR:
-            return com_loaderr(state, action)
         default: 
             return state
     }
@@ -84,25 +79,11 @@ const companyReducer = (state = [], action) => {
 
 export default companyReducer
 
-function com_loading(state, action) {
-    return state;
-}
-
-function com_loaded(state, action) {
-    var incoming = action.company
-    console.log(incoming)
-    return incoming
-}
-
-function com_loaderr(state, action) {
-    return state
-}
-
 export const saveCom = () => async (dispatch, getState) => {
     const companies = getState().company
     const index = companies.length - 1
-    console.log(companies)
-    //TODO: Companies with same name should be not allowed to add
+    //console.log(companies)
+    //TODO: Companies with same name should be not allowed to add done
     await fetch(config.serverUrl+"/api/company/", {
         method: "POST",
         headers: {
@@ -110,7 +91,23 @@ export const saveCom = () => async (dispatch, getState) => {
         },
         body: JSON.stringify(companies[index])
     }).then(alert("Company added."))
-    //TODO: FIX the adding companies error when adding consecutively
+    //TODO: FIX the adding companies error when adding consecutively done
+
+}
+
+export const saveExcelCom = () => async (dispatch, getState) => {
+    const companies = getState().company
+    const index = companies.length - 1
+    //console.log(companies)
+    //TODO: Companies with same name should be not allowed to add
+    await fetch(config.serverUrl+"/api/company/", {
+        method: "POST",
+        headers: {
+            "Content-type": 'application/json'
+        },
+        body: JSON.stringify(companies[index])
+    })
+    //TODO: FIX the adding companies error when adding consecutively done
 
 }
 
@@ -125,7 +122,7 @@ export const delCom = (id) => async (dispatch, getState) => {
     // console.log("deleting id: ", id)
     fetch(config.serverUrl+"/api/company/"+id, {
         method: "DELETE"
-    }).then(alert("Company removed."))
+    })
     //TODO: RELOAD the companies to maintain the new state DONE
 }
 

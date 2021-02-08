@@ -20,10 +20,8 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import readXlsxFile from 'read-excel-file';
 import XLSX from 'xlsx'
-import { addCom, deleteCom, updateCom } from '../../redux/actions/companyActions'
-
-import {loadCompanies} from '../../redux/actions/thunks/index'
-import { saveCom, loadCom, delCom, upCom } from '../../redux/reducers/companyReducer'
+import { addCom, deleteCom, updateCom, addComViaExcelFile } from '../../redux/actions/companyActions'
+import { saveCom, loadCom, delCom, upCom, saveExcelCom } from '../../redux/reducers/companyReducer'
 
 // MaterialTable ref: https://material-table.com/#/
 // TODO: Add the full object to dispatch and reducer DONE
@@ -199,24 +197,34 @@ export default function TableList() {
       fileReader.readAsArrayBuffer(file);
 
       fileReader.onload = (e) => {
+        try {
         const bufferArray = e.target.result;
         
         const wb = XLSX.read(bufferArray, {type: 'buffer'});
 
         const wsname = wb.SheetNames[0];
         
+        console.log(wsname)
+
         const ws=wb.Sheets[wsname];
 
         const eData = XLSX.utils.sheet_to_json(ws)
 
+        console.log(eData)
+
         res(eData)
+      } catch (err) {
+        alert("Error, you may uploaded a file with wrong type or format, please check again.", err)
+        window.location.reload()
+      }
       };
 
       fileReader.onerror=(error) => {
-        rej(error);
+        //rej(error);
+        alert("Error")
+        window.location.reload()
       };
     });
-
     promise.then((d)=>{
       console.log(d)
       setOpen(true)
@@ -238,54 +246,120 @@ export default function TableList() {
  }
 
   const addCompany = (ndata) => {
-    dispatch(addCom(ndata))
-    dispatch(saveCom())
+    var allowToAdd = true
+    for (let i = 0; i < state.length; i++) {
+      if (ndata.companyName === state[i].companyName) {
+        alert("Fail to add company, this company already exists.")
+        allowToAdd = false
+      }
+    }
+    if (allowToAdd) {
+      dispatch(addCom(ndata))
+      dispatch(saveCom())
+      setData([...data, ndata]);
+    }
     dispatch(loadCom())
   }
 
   const deleteCompany = (comList, index) => {
     dispatch(deleteCom(comList, index))
     dispatch(delCom(comList[index]._id))
+    alert("Company removed.")
   }
 
-  const updateCompany = (ndata) => {
-    //console.log(ndata)
-    dispatch(updateCom(ndata))
-    dispatch(upCom(ndata))
-    dispatch(loadCom())
+  const updateCompany = (ndata, tableID) => {
+    var ifNew = false
+    var allowToUp = 0
+
+    //if modified to a new company
+    for (let i = 0; i < state.length; i++) {
+      if (ndata.companyName === state[i].companyName) {
+        ifNew = true;
+      }
+    }
+    //if duplicated
+    console.log(ndata)
+    var restArr = state
+    restArr.splice(tableID,1)
+    console.log(restArr)
+    for (let i = 0; i < restArr.length; i++) {
+      console.log("comparing", ndata.companyName, restArr[i].companyName)
+      if (ndata.companyName === restArr[i].companyName) {
+        console.log("they are the same: ", ndata.companyName, restArr[i].companyName)
+        allowToUp += 1;
+      }
+      console.log("allup: ", allowToUp)
+    }
+    if (!ifNew) {
+      alert("Fail to update, target company doesn't exist.")
+    } else {
+    if (allowToUp === 0) {
+      console.log(allowToUp, ndata)
+      const dataUpdate = [...data];
+      const index = tableID;
+      dataUpdate[index] = ndata;
+      dispatch(updateCom(ndata, tableID))
+      dispatch(upCom(ndata))
+      setData([...dataUpdate]);
+    }
+    if (allowToUp >= 1) {
+      console.log(allowToUp)
+      alert("Fail to update, only one company should exist.")
+    }
+  }
+  dispatch(loadCom())
   }
 
   const addComViaExcel = () => {
     //TODO: This function should add company info row by row instead of import the whole list. 1st: check if there are already one with the same company name. 2nd: if yes, update; if no, insert.
+    //TODO: All companies should be sent, companies with same cname should be overwrite.
+      var originTableData = data
+      var i = 0;
+      // Check imported data array
+      for( i; i<excelData.length; i++) {
+        //com to import: excelData[i]
 
-    dispatch({
-      type: "ADD_COM_VIA_EXCEL",
-      payload: {
-        filedata: excelData
+        //check if it's duplicated
+        for(let k = 0 ; k < data.length; k++){
+          //console.log("comparing: ",excelData[i].companyName," and ",data[k].companyName )
+          if(excelData[i].companyName === data[k].companyName) {
+            //remove it from data
+            // console.log("duplicated one: ",excelData[i])
+            // console.log(originTableData, originTableData[k].tableData.id)
+            // console.log(originTableData[originTableData[k].tableData.id]._id)
+            dispatch(deleteCom(originTableData, originTableData[k].tableData.id))
+            dispatch(delCom(originTableData[originTableData[k].tableData.id]._id))
+          }
+        }
+          dispatch(addCom(excelData[i]))
+          dispatch(saveExcelCom())
+          setData([...data, excelData[i]]);
       }
-    })
+    //console.log("data: ",data)
+    alert("Excel data imported.")
+    window.location.reload()
     setOpen(false)
   }
 
-  function refreshPage() {
-    window.location.reload(false);
-  }
-
-
   const handleClose = () => {
     setOpen(false);
+    setExcelData([]);
   };
 
   useEffect(() => {
-    console.log(data[0])
     if (!data[0]) {
       fetchCom() 
     }
   },[])
 
+  function refresh() {
+    window.location.reload()
+  }
+
   //test
   function handleClick() {
-    console.log(state)
+    console.log(data)
+    console.log(excelData)
   }
 
   const fetchCom = async () => {
@@ -312,7 +386,7 @@ export default function TableList() {
         onRowAdd: newData =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              setData([...data, newData]);
+              //setData([...data, newData]);
               addCompany(newData);
               resolve();
             }, 1000)
@@ -323,8 +397,8 @@ export default function TableList() {
               const dataUpdate = [...data];
               const index = oldData.tableData.id;
               dataUpdate[index] = newData;
-              setData([...dataUpdate]);
-              updateCompany(newData)
+              //setData([...dataUpdate]);
+              updateCompany(newData, index)
               resolve();
             }, 1000)
           }),
@@ -351,6 +425,7 @@ export default function TableList() {
         Upload Excel File
         <input
           type="file"
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange = {(e)=>{
             const file = e.target.files[0];
             readExcel(file);
@@ -387,14 +462,14 @@ export default function TableList() {
           <DialogContent>
             {excelData != null ?
             <DialogContentText id="alert-dialog-description">
-              Are you sure to upload {excelData.length} rows of data?
+              Are you sure to upload {excelData.length} rows of data? (Companies with same name will be overwrite)
             </DialogContentText>
             :
             <></>
             }
           </DialogContent>
           <DialogActions>
-            <Button onClick={refreshPage} color="primary">
+            <Button onClick={handleClose} color="primary">
               No
             </Button>
             <Button color="primary" onClick={addComViaExcel} autoFocus>
