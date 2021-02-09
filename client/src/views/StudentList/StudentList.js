@@ -10,8 +10,17 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import MaterialTable from 'material-table'
 import Button from "components/CustomButtons/Button.js";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import { useState, useEffect } from 'react';
+import XLSX from 'xlsx'
+import { addStu, deleteStu, updateStu, addStuViaExcelFile } from '../../redux/actions/studentActions'
+import { saveStu, loadStu, delStu, upStu, saveExcelStu } from '../../redux/reducers/studentReducer'
 
 // MaterialTable ref: https://material-table.com/#/
 // TODO: Add the full object to dispatch and reducer DONE
@@ -62,69 +71,297 @@ export default function TableList() {
     { title: 'Email', field: 'email'},
     {
       title: 'State',
-      field: 'state',
+      field: 'stuState',
       lookup: { 0: 'Not active', 1: 'Seeking for Interviews', 2: 'Waiting for Response', 3: 'Got the Internship'},
     }, 
     {
       title: 'First Interest',
       field: 'interest1',
-      lookup: { 0: 'No Preference', 1: 'Frontend Developer', 2: 'Backend Developer', 3: 'Full Stack Developer', 4: 'Data Analyst', 5: 'UI Designer', 6: 'Tester', 7: 'Consultant', 8: 'Doc Manager' },
+      lookup: {
+        0: 'No Preference',
+        1: 'AI/Machine Learning',
+        2: 'Architercture Policy and Planning',
+        3: 'Automation of Processes',
+        4: 'Business Analytics',
+        5: 'Blockchain',
+        6: 'CCTV Analytics Build',
+        7: 'Chatbots',
+        8: 'Cloud',
+        9: 'CMS',
+        10: 'Consultancy',
+        11: 'Data Analytics',
+        12: 'Data Mining and Big Data',
+        13: 'Data Visualisation',
+        14: 'Databases',
+        15: 'Development',
+        16: 'Game Development',
+        17: 'Graphics',
+        18: 'Health Informatics',
+        19: 'Information and Data Governanace',
+        20: 'IoT Scoping',
+        21: 'Statistical Modeling and Anlaysis by ML',
+        22: 'Networking Security',
+        23: 'Networking Services',
+        24: 'Project Management',
+        25: 'Robotics',
+        26: 'Telecommunication',
+        27: 'Testing/QA',
+        28: 'UI/UX'
+    },
     },
     {
       title: 'Second Interest',
       field: 'interest2',
-      lookup: { 0: 'No Preference', 1: 'Frontend Developer', 2: 'Backend Developer', 3: 'Full Stack Developer', 4: 'Data Analyst', 5: 'UI Designer', 6: 'Tester', 7: 'Consultant', 8: 'Doc Manager' },
+      lookup: {
+        0: 'No Preference',
+        1: 'AI/Machine Learning',
+        2: 'Architercture Policy and Planning',
+        3: 'Automation of Processes',
+        4: 'Business Analytics',
+        5: 'Blockchain',
+        6: 'CCTV Analytics Build',
+        7: 'Chatbots',
+        8: 'Cloud',
+        9: 'CMS',
+        10: 'Consultancy',
+        11: 'Data Analytics',
+        12: 'Data Mining and Big Data',
+        13: 'Data Visualisation',
+        14: 'Databases',
+        15: 'Development',
+        16: 'Game Development',
+        17: 'Graphics',
+        18: 'Health Informatics',
+        19: 'Information and Data Governanace',
+        20: 'IoT Scoping',
+        21: 'Statistical Modeling and Anlaysis by ML',
+        22: 'Networking Security',
+        23: 'Networking Services',
+        24: 'Project Management',
+        25: 'Robotics',
+        26: 'Telecommunication',
+        27: 'Testing/QA',
+        28: 'UI/UX'
+    },
     },
     {
       title: 'Third Interest',
       field: 'interest3',
-      lookup: { 0: 'No Preference', 1: 'Frontend Developer', 2: 'Backend Developer', 3: 'Full Stack Developer', 4: 'Data Analyst', 5: 'UI Designer', 6: 'Tester', 7: 'Consultant', 8: 'Doc Manager' },
+      lookup: {
+        0: 'No Preference',
+        1: 'AI/Machine Learning',
+        2: 'Architercture Policy and Planning',
+        3: 'Automation of Processes',
+        4: 'Business Analytics',
+        5: 'Blockchain',
+        6: 'CCTV Analytics Build',
+        7: 'Chatbots',
+        8: 'Cloud',
+        9: 'CMS',
+        10: 'Consultancy',
+        11: 'Data Analytics',
+        12: 'Data Mining and Big Data',
+        13: 'Data Visualisation',
+        14: 'Databases',
+        15: 'Development',
+        16: 'Game Development',
+        17: 'Graphics',
+        18: 'Health Informatics',
+        19: 'Information and Data Governanace',
+        20: 'IoT Scoping',
+        21: 'Statistical Modeling and Anlaysis by ML',
+        22: 'Networking Security',
+        23: 'Networking Services',
+        24: 'Project Management',
+        25: 'Robotics',
+        26: 'Telecommunication',
+        27: 'Testing/QA',
+        28: 'UI/UX'
     },
+    },
+    { title: 'Note', field: 'note'},
   ]);
 
-  const state = useSelector((state) => state.student)
-  console.log(state)  // A student array
+  const [open, setOpen] = React.useState(false);
 
+  const [excelData, setExcelData] = useState()
+
+  const state = useSelector((state) => state.student)
   var [data, setData] = useState(state);
 
+  //console.log(state)  // A student array
+
+  const readExcel = (file) => {
+    const promise = new Promise((res, rej) => {
+      const fileReader = new FileReader();
+      fileReader.readAsArrayBuffer(file);
+
+      fileReader.onload = (e) => {
+        try {
+        const bufferArray = e.target.result;
+        
+        const wb = XLSX.read(bufferArray, {type: 'buffer'});
+
+        const wsname = wb.SheetNames[0];
+        
+        const ws=wb.Sheets[wsname];
+
+        const eData = XLSX.utils.sheet_to_json(ws)
+
+        console.log(eData)
+
+        res(eData)
+      } catch (err) {
+        alert("Error, you may uploaded a file with wrong type or format, please check again.", err)
+        window.location.reload()
+      }
+      };
+
+      fileReader.onerror=(error) => { 
+        alert("Error") 
+        window.location.reload()
+      };
+    });
+    promise.then((d)=>{
+      console.log(d)
+      setOpen(true)
+      setExcelData(d);
+    })
+  }
+
+  const readJson = (file) =>{
+    const fileReader = new FileReader();
+    fileReader.onloadend = ()=>{
+       try{
+          var obj = JSON.parse(fileReader.result);
+          console.log(obj)
+       }catch(e){
+       }
+    }
+    if( file !== undefined)
+       fileReader.readAsText(file);
+ }
+
   const addStudent = (ndata) => {
-    dispatch({
-        type: "CREATE_STUDENT",
-        payload: {
-          studentName: ndata.studentName,
-          email: ndata.email,
-          state: ndata.state,
-          interest1: ndata.interest1,
-          interest2: ndata.interest2,
-          interest3: ndata.interest3,
-        }
-      })
-  }
-
-  const deleteStudent = (index) => {
-    var dstuName = state[index].studentName;
-    dispatch({
-      type: "DELETE_STUDENT",
-      payload: {
-        studentName: dstuName,
+    var allowToAdd = true
+    for (let i = 0; i < state.length; i++) {
+      if (ndata.studentName === state[i].studentName) {
+        alert("Fail to add student, this student already exists.")
+        allowToAdd = false
       }
-    })
+    }
+    if (allowToAdd) {
+      dispatch(addStu(ndata))
+      dispatch(saveStu())
+      setData([...data, ndata]);
+    }
+    dispatch(loadStu())
   }
 
-  const updateStudent = (ndata) => {
+  const deleteStudent = (stuList, index) => {
+    dispatch(deleteStu(stuList, index))
+    dispatch(delStu(stuList[index]._id))
+    alert("Student removed.")
+  }
+
+  const updateStudent = (ndata, tableID) => {
+    var ifNew = false
+    var allowToUp = 0
+
+    //if modified to a new student
+    for (let i = 0; i < state.length; i++) {
+      if (ndata.studentName === state[i].studentName) {
+        ifNew = true;
+      }
+    }
+    //if duplicated
     console.log(ndata)
-    dispatch({
-      type: "UPDATE_STUDENT",
-      payload: {
-          index: ndata.tableData.id,
-          studentName: ndata.studentName,
-          email: ndata.email,
-          state: ndata.state,
-          interest1: ndata.interest1,
-          interest2: ndata.interest2,
-          interest3: ndata.interest3,
+    var restArr = state
+    restArr.splice(tableID,1)
+    console.log(restArr)
+    for (let i = 0; i < restArr.length; i++) {
+      console.log("comparing", ndata.studentName, restArr[i].studentName)
+      if (ndata.studentName === restArr[i].studentName) {
+        console.log("they are the same: ", ndata.studentName, restArr[i].studentName)
+        allowToUp += 1;
       }
-    })
+      console.log("allup: ", allowToUp)
+    }
+    if (!ifNew) {
+      alert("Fail to update, target student doesn't exist.")
+    } else {
+    if (allowToUp === 0) {
+      console.log(allowToUp, ndata)
+      const dataUpdate = [...data];
+      const index = tableID;
+      dataUpdate[index] = ndata;
+      dispatch(updateStu(ndata, tableID))
+      dispatch(upStu(ndata))
+      setData([...dataUpdate]);
+    }
+    if (allowToUp >= 1) {
+      console.log(allowToUp)
+      alert("Fail to update, only one student should exist.")
+    }
+  }
+  dispatch(loadStu())
+  }
+
+  const addStuViaExcel = () => {
+    //TODO: This function should add student info row by row instead of import the whole list. 1st: check if there are already one with the same student name. 2nd: if yes, update; if no, insert.
+    //TODO: All students should be sent, students with same cname should be overwrite.
+      var originTableData = data
+      var i = 0;
+      // Check imported data array
+      for( i; i<excelData.length; i++) {
+        //com to import: excelData[i]
+
+        //check if it's duplicated
+        for(let k = 0 ; k < data.length; k++){
+          //console.log("comparing: ",excelData[i].studentName," and ",data[k].studentName )
+          if(excelData[i].studentName === data[k].studentName) {
+            //remove it from data
+            // console.log("duplicated one: ",excelData[i])
+            // console.log(originTableData, originTableData[k].tableData.id)
+            // console.log(originTableData[originTableData[k].tableData.id]._id)
+            dispatch(deleteStu(originTableData, originTableData[k].tableData.id))
+            dispatch(delStu(originTableData[originTableData[k].tableData.id]._id))
+          }
+        }
+          dispatch(addStu(excelData[i]))
+          dispatch(saveExcelStu())
+          setData([...data, excelData[i]]);
+      }
+    //console.log("data: ",data)
+    alert("Excel data imported.")
+    window.location.reload()
+    setOpen(false)
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+    setExcelData([]);
+  };
+
+  useEffect(() => {
+    if (!data[0]) {
+      fetchStu() 
+    }
+  },[])
+
+  function refresh() {
+    window.location.reload()
+  }
+
+  //test
+  function handleClick() {
+    console.log(data)
+    console.log(excelData)
+  }
+
+  const fetchStu = async () => {
+    const student = await dispatch(loadStu())
+    setData(student)
   }
 
   return (
@@ -146,7 +383,6 @@ export default function TableList() {
         onRowAdd: newData =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              setData([...data, newData]);
               addStudent(newData);
               resolve();
             }, 1000)
@@ -157,8 +393,8 @@ export default function TableList() {
               const dataUpdate = [...data];
               const index = oldData.tableData.id;
               dataUpdate[index] = newData;
-              setData([...dataUpdate]);
-              updateStudent(newData)
+              //setData([...dataUpdate]);
+              updateStudent(newData, index)
               resolve();
             }, 1000)
           }).then(console.log(newData)),
@@ -169,7 +405,7 @@ export default function TableList() {
               const index = oldData.tableData.id;
               dataDelete.splice(index, 1);
               setData([...dataDelete]);
-              deleteStudent(index);
+              deleteStudent(state ,index);
               resolve()
             }, 1000)
           }),
@@ -178,11 +414,65 @@ export default function TableList() {
           </CardBody>
         </Card>
         <Button
-          color="primary"
-          onClick={()=>console.log(state)}
-          >
-          show state
-          </Button>
+        variant="contained"
+        color="primary"
+        component="label"
+        >
+        Upload Excel File
+        <input
+          type="file"
+          accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          onChange = {(e)=>{
+            const file = e.target.files[0];
+            readExcel(file);
+          }}
+          hidden
+        />
+        </Button>
+        <Button
+        variant="contained"
+        color="info"
+        component="label"
+        >
+        Upload Json File frim Trello
+        <input
+          type="file"
+          onChange = {(e)=>{
+            const file = e.target.files[0];
+            readJson(file);
+          }}
+          hidden
+        />
+        </Button>
+        <Button onClick={handleClick}>
+          getAllStudent
+        </Button>
+
+          <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Data from Excel Detected!"}</DialogTitle>
+          <DialogContent>
+            {excelData != null ?
+            <DialogContentText id="alert-dialog-description">
+              Are you sure to upload {excelData.length} rows of data? (Companies with same name will be overwrited)
+            </DialogContentText>
+            :
+            <></>
+            }
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              No
+            </Button>
+            <Button color="primary" onClick={addStuViaExcel} autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>        
       </GridItem>
     </GridContainer>
   );

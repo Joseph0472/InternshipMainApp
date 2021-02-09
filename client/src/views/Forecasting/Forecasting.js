@@ -13,6 +13,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
+
 const styles = {
   typo: {
     paddingLeft: "25%",
@@ -52,14 +53,14 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function TypographyPage() {
+export default function ForecastingPage() {
   const classes = useStyles();
   return (
     <Card>
       <CardHeader color="primary">
-        <h4 className={classes.cardTitleWhite}>Material Dashboard Heading</h4>
+        <h4 className={classes.cardTitleWhite}>Forecasting</h4>
         <p className={classes.cardCategoryWhite}>
-          Created using Roboto Font Family
+          Forecast and specify the workload
         </p>
       </CardHeader>
       <CardBody>

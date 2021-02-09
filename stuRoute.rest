@@ -1,0 +1,28 @@
+### Get All Company
+GET http://localhost:10000/api/student/
+
+### Get One
+GET http://localhost:10000/api/student/
+
+### Create One
+POST http://localhost:10000/api/student/
+Content-Type: application/json
+
+{ 
+    "studentName": "Cody", 
+    "email": "cody@gmail.com", 
+    "stuState": 1, 
+    "interest1": 4, 
+    "interest2": 5, 
+    "interest3": 2,
+    "note": "Recently contacted." 
+    }
+
+### Delete One
+DELETE http://localhost:10000/api/student/60211dc36e81c206a413eed3
+
+### Updating One
+PATCH  http://localhost:10000/api/student/60211eca60b49336d4acdd68
+Content-Type: application/json
+
+{"studentName":"Vick", "note":"She's good"}

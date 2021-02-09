@@ -24,12 +24,14 @@ import LocationOn from "@material-ui/icons/LocationOn";
 import Notifications from "@material-ui/icons/Notifications";
 import Unarchive from "@material-ui/icons/Unarchive";
 import Language from "@material-ui/icons/Language";
+import Timeline from "@material-ui/icons/Timeline";
+
 // core components/views for Admin layout
 import DashboardPage from "views/Dashboard/Dashboard.js";
 import UserProfile from "views/UserProfile/UserProfile.js";
-import TableList from "views/TableList/TableList.js";
+import CompanyList from "views/TableList/TableList.js";
 import StudentList from "views/StudentList/StudentList.js";
-import Typography from "views/Typography/Typography.js";
+import Forecasting from "views/Forecasting/Forecasting.js";
 import Icons from "views/Icons/Icons.js";
 import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
@@ -58,7 +60,7 @@ const dashboardRoutes = [
     name: "Company List",
     rtlName: "قائمة الجدول",
     icon: "content_paste",
-    component: TableList,
+    component: CompanyList,
     layout: "/admin"
   },
   {
@@ -70,11 +72,11 @@ const dashboardRoutes = [
     layout: "/admin"
   },
   {
-    path: "/typography",
-    name: "Typography",
+    path: "/forecasting",
+    name: "Forecasting",
     rtlName: "طباعة",
-    icon: LibraryBooks,
-    component: Typography,
+    icon: Timeline,
+    component: Forecasting,
     layout: "/admin"
   },
   {

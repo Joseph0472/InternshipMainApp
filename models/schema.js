@@ -32,8 +32,33 @@ const companySchema = new mongoose.Schema({
     interest3: {
         type: Number,
     },
-    
-
 })
 
 export const Company = mongoose.model('Company', companySchema)
+
+const studentSchema = new mongoose.Schema({
+    studentName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+    },
+    stuState: {
+        type: Number,
+    },
+    interest1: {
+        type: Number,
+    },
+    interest2: {
+        type: Number,
+    },
+    interest3: {
+        type: Number,
+    },
+    note: {
+        type: String,
+    }
+})
+
+export const Student = mongoose.model('Student', studentSchema)

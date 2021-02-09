@@ -18,7 +18,6 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { useState, useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import readXlsxFile from 'read-excel-file';
 import XLSX from 'xlsx'
 import { addCom, deleteCom, updateCom, addComViaExcelFile } from '../../redux/actions/companyActions'
 import { saveCom, loadCom, delCom, upCom, saveExcelCom } from '../../redux/reducers/companyReducer'
@@ -64,7 +63,7 @@ const styles = {
 
 const useStyles = makeStyles(styles);
 
-export default function TableList() {
+export default function CompanyList() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const state = useSelector((state) => state.company)
@@ -386,7 +385,6 @@ export default function TableList() {
         onRowAdd: newData =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              //setData([...data, newData]);
               addCompany(newData);
               resolve();
             }, 1000)
@@ -462,7 +460,7 @@ export default function TableList() {
           <DialogContent>
             {excelData != null ?
             <DialogContentText id="alert-dialog-description">
-              Are you sure to upload {excelData.length} rows of data? (Companies with same name will be overwrite)
+              Are you sure to upload {excelData.length} rows of data? (Companies with same name will be overwrited)
             </DialogContentText>
             :
             <></>
