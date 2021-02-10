@@ -475,7 +475,6 @@ export default function CompanyList() {
             </Button>
           </DialogActions>
         </Dialog>
-
       </GridItem>
     </GridContainer>
   );

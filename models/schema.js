@@ -62,3 +62,19 @@ const studentSchema = new mongoose.Schema({
 })
 
 export const Student = mongoose.model('Student', studentSchema)
+
+const forecastSchema = new mongoose.Schema({
+    period: {
+        type: String,
+        required: true,
+    },
+    stuNum: {
+        type: Number,
+    },
+    comNum: {
+        type: Number,
+    },
+
+})
+
+export const Forecast = mongoose.model('Forecast', forecastSchema)

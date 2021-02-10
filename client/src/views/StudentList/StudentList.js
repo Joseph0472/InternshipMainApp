@@ -187,6 +187,7 @@ export default function TableList() {
   const [excelData, setExcelData] = useState()
 
   const state = useSelector((state) => state.student)
+  
   var [data, setData] = useState(state);
 
   //console.log(state)  // A student array
