@@ -35,8 +35,9 @@ import Typography from '@material-ui/core/Typography';
 import { Grid, TextField } from "@material-ui/core";
 import Input from '@material-ui/core/Input';
 import regression from "regression"
-
-
+import Skeleton from 'react-loading-skeleton';
+import { loadCom } from '../../redux/reducers/companyReducer' 
+import { loadStu } from '../../redux/reducers/studentReducer'
 
 const styles = {
   typo: {
@@ -124,6 +125,9 @@ const styles = {
     paddingRight: "100px",
     // marginLeft: "30px",
     // marginRight: "100px"
+  },
+  loading: {
+    width: "auto",
   }
 };
 
@@ -133,41 +137,79 @@ export default function ForecastingPage() {
   const classes = useStyles();
   const dispatch = useDispatch();
   const state = useSelector((state) => state)
-  console.log(state) //{company: Array(52), student: Array(24)}
+  // console.log(state) //{company: Array(52), student: Array(24)}
+  const [data, setData] = useState(0)
 
-  const initForeData =  {
-    totalComNum: 0,
-    activeComNum: 0,
-    totalStuNum: 0,
-    stuSeekingForInterNum: 0,
-    stuWaitingForResNum: 0,
-    stuGotTheInterNum: 0
-  }
-  const [foreData, setForeData] = useState(initForeData);
-
-  var totalComNum = state.company.length
-  var activeComNum = 0;
-  state.company.forEach(company => {
-    if(company.ifActive) {
-      activeComNum++;
-    }
+  const [foreData, setForeData] = useState({
+    totalComNum: 0, 
+    activeComNum: 0, 
+    totalStuNum: 0, 
+    stuSeekingForInterNum: 0, 
+    stuWaitingForResNum: 0, 
+    stuGotTheInterNum: 0,
   });
-  var totalStuNum = state.student.length
-  var stuSeekingForInterNum = 0;
-  var stuWaitingForResNum = 0;
-  var stuGotTheInterNum = 0;
 
+  const [foreRes, setForeRes] = useState({
+    totalComNeed: 0,
+    interestedCom: 0,
+    onBoardCom: 0,
+    fstPopularInt: 0,
+    secPopularInt: 0,
+    thdPopularInt: 0,
+    comForFst: 0,
+    comForSec: 0,
+    comForThd: 0,
+
+  })
+
+  const [loading, setLoading] = useState(false)
+  const [readyToShow, setReadyToShow] = useState(false)
+  const [inPara, setInPara] = useState(5)
+  const [exPara, setExPara] = useState(5)
+  const [error, setErr] = useState(false)
+
+  const lookup = {
+    0: 'No Preference',
+    1: 'AI/Machine Learning',
+    2: 'Architercture Policy and Planning',
+    3: 'Automation of Processes',
+    4: 'Business Analytics',
+    5: 'Blockchain',
+    6: 'CCTV Analytics Build',
+    7: 'Chatbots',
+    8: 'Cloud',
+    9: 'CMS',
+    10: 'Consultancy',
+    11: 'Data Analytics',
+    12: 'Data Mining and Big Data',
+    13: 'Data Visualisation',
+    14: 'Databases',
+    15: 'Development',
+    16: 'Game Development',
+    17: 'Graphics',
+    18: 'Health Informatics',
+    19: 'Information and Data Governanace',
+    20: 'IoT Scoping',
+    21: 'Statistical Modeling and Anlaysis by ML',
+    22: 'Networking Security',
+    23: 'Networking Services',
+    24: 'Project Management',
+    25: 'Robotics',
+    26: 'Telecommunication',
+    27: 'Testing/QA',
+    28: 'UI/UX'
+}
 
   function createCurData(category, value) {
     return { category, value };
   }
   
   const cunrrentInfoRows = [
-    createCurData('Total student number', 159),
-    createCurData('Students seeking for interviews', 237),
-    createCurData('Students waiting for response', 262),
-    createCurData('Students got the internship', 305),
-    createCurData('Total active company number', 200),
+    createCurData('Total student number', foreData.totalStuNum),
+    createCurData('Students seeking for interviews', foreData.stuSeekingForInterNum),
+    createCurData('Students waiting for response', foreData.stuWaitingForResNum),
+    createCurData('Students got the internship', foreData.stuGotTheInterNum),
+    createCurData('Total active company number', foreData.activeComNum),
   ];
 
   function createHisData(period, stuNum, comNum) {
@@ -182,16 +224,132 @@ export default function ForecastingPage() {
     createHisData('2019 Summer Semester', 36, 327),
   ];
 
-  const regData = [[30,166], [27,171], [30,110], [25,132], [36, 327]]
+  function createResultData(category, value) {
+    return { category, value };
+  }
+
+
+  //TODO: Make it dynamic
+  const hisData = [[30,166], [27,171], [30,110], [25,132], [36, 327]]
 
   function handleForecast(){
-    const result = regression.linear([[0, 1], [32, 67], [12, 79]]);
+    const result = regression.linear(hisData);
     const gradient = result.equation[0];
     const yIntercept = result.equation[1];
     console.log("forcasting gradient: ",gradient )
-    console.log("forcasting yIntercept: ",yIntercept )
+    console.log("forcasting yIntercept: ",yIntercept)
+    // M O D E L
+    const predictedTotalCom = Math.ceil(gradient*foreData.totalStuNum + (5-inPara)*0.2*foreData.totalStuNum + (5-exPara)*0.2*foreData.totalStuNum + yIntercept) 
+    const interestedComNum = Math.ceil(predictedTotalCom*0.14)
+    const onBoardcomNum = Math.ceil(interestedComNum*0.81)
+    // use a counter array to count the companies required.
+    var countArr = new Array(29).fill(0);
+    var activeStuArr = []
+    state.student.forEach(student => {
+      if (student.stuState !== 0 && student.stuState !== 3) {
+        activeStuArr.push(student)
+      }
+    });
+    console.log(activeStuArr)
+    activeStuArr.forEach(student => {
+      countArr[student.interest1]++
+    });
+    var sortedArr = [...countArr].sort().reverse();
+    var fstPopInt = countArr.indexOf(sortedArr[0])
+    var secPopInt = countArr.indexOf(sortedArr[1])
+    var thdPopInt = countArr.indexOf(sortedArr[2])
+  
+    var activeStuNum = foreData.stuSeekingForInterNum + foreData.stuWaitingForResNum
+
+    var comForFNum = Math.ceil(sortedArr[0]/activeStuNum * predictedTotalCom)
+    //console.log(lookup[fstPopInt]) worked
+    //console.log(sortedArr[0]) worked
+    console.log(comForFNum)//TODO: fix the relation here
+    var comForSNum = Math.ceil(sortedArr[1]/activeStuNum * predictedTotalCom)
+    var comForTNum = Math.ceil(sortedArr[2]/activeStuNum * predictedTotalCom)
+    
+    setForeRes({...foreRes, totalComNeed: predictedTotalCom, interestedCom: interestedComNum, onBoardCom: onBoardcomNum, fstPopularInt: fstPopInt, secPopularInt: secPopInt, thdPopularInt: thdPopInt, comForFst: comForFNum,comForSec: comForSNum, comForThd: comForTNum})
+    console.log(foreRes)
+
+    setReadyToShow(false)
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+      setReadyToShow(true)
+    }, 3000)
 
   }
+
+  const resultRows = [
+    createResultData("Total number of companies need to be reached out", foreRes.totalComNeed),
+    createResultData("Number of companies would be interested at next stage", foreRes.interestedCom),
+    createResultData("Number of companies would be on board", foreRes.onBoardCom),
+    createResultData("Companies with these interests are mainly required", lookup[foreRes.fstPopularInt]+", "+lookup[foreRes.secPopularInt]+", "+lookup[foreRes.thdPopularInt]),
+    createResultData("Companies interested in "+lookup[foreRes.fstPopularInt]+" need to be reach out", foreRes.comForFst),
+    createResultData("Companies interested in "+lookup[foreRes.secPopularInt]+" need to be reach out", foreRes.comForSec),
+    createResultData("Companies interested in "+lookup[foreRes.thdPopularInt]+" need to be reach out", foreRes.comForThd)
+    //custmized colum name
+  ]
+  
+  useEffect(() => {
+      fetchInfo()
+    // Load Data
+       var totalCom = state.company.length
+       var activeCom = 0;
+       state.company.forEach(company => {
+         if(company.ifActive) {
+           activeCom++;
+         }
+       });
+       var totalStu = state.student.length
+       //0: 'Not active', 1: 'Seeking for Interviews', 2: 'Waiting for Response', 3: 'Got the Internship'
+       var stuSeekingForInter = 0;
+       state.student.forEach(student => {
+         if(student.stuState === 1) {
+           stuSeekingForInter++;
+         }
+       });
+       var stuWaitingForRes = 0;
+       state.student.forEach(student => {
+         if(student.stuState === 2) {
+           stuWaitingForRes++;
+         }
+       });
+       var stuGotTheInter = 0;
+       state.student.forEach(student => {
+         if(student.stuState === 3) {
+           stuGotTheInter++;
+         }
+       });
+       setForeData({...foreData, totalComNum: totalCom, activeComNum: activeCom, totalStuNum: totalStu, stuSeekingForInterNum: stuSeekingForInter, stuWaitingForResNum: stuWaitingForRes, stuGotTheInterNum: stuGotTheInter})
+    // }
+  },[])
+
+  function handleInPara(e) {
+    if (e.target.value < 1 || e.target.value > 10) {
+      setErr(true)
+    } else {
+      setInPara(e.target.value)
+      setErr(false)
+    }
+  }
+  function handleExPara(e) {
+    if (e.target.value < 1 || e.target.value > 10) {
+      setErr(true)
+    } else {
+      setExPara(e.target.value)
+      setErr(false)
+    }
+  }
+
+  const fetchInfo = async () => {
+    const companies = await dispatch(loadCom())
+    const students = await dispatch(loadStu())
+    console.log(companies)
+    setData(1)
+    console.log(data)
+  }
+  
 
 
   return (
@@ -257,28 +415,65 @@ export default function ForecastingPage() {
       <Grid container xs={12} sm={12} md={12} justify="center">
         <Card className={classes.foreCard}>
           <Grid item xs={12}>
-          <CardHeader>The forecasting model contains internal and external influence factors. You can forecast the workload based on the info above with default parameters' value, or modify them to have different results.</CardHeader>
+          <CardHeader>The forecasting model contains internal and external influence factors. You can forecast the workload based on the info above with default parameters' value, or modify them to have different results. NOTE: The parameters' value range is from 1 to 10, 1 stands for pessimistic and 10 stands for optimistic.</CardHeader>
           </Grid>
               <CardBody className={classes.cardBody}>
                 <Grid container xs={12} sm={12} md={12} justify="center" alignItems="stretch">
                   <Grid item xs={4}>
                     <TextField className={classes.cardItem}
                     label="Internal parameter"
-                    defaultValue="1"
-                    helperText="*Students study performance"
+                    defaultValue="5"
                     variant="filled"
+                    type="number"
+                    error={error}
+                    helperText={error?"Invalid parameter value":"*Students study performance"}
+                    onChange={(e)=>handleInPara(e)}
                     ></TextField>
                     </Grid>
                     <Grid item xs={4}>
                     <TextField className={classes.cardItem}
-                    defaultValue="1"
-                    helperText="*The activeness of the job market "
-                    variant="filled"></TextField>
+                    label="External parameter"
+                    defaultValue="5"
+                    type="number"
+                    variant="filled"
+                    error={error}
+                    helperText={error?"Invalid parameter value":"*The activeness of the job market"}
+                    onChange={handleExPara}
+                    ></TextField>
                     </Grid>
                     <Grid item xs={4}>
-                    <Button className={classes.button}>Forecast</Button>
+                    <Button className={classes.button} onClick={handleForecast} disabled={error} >Forecast</Button>
                   </Grid>
                 </Grid>
+              {loading &&
+                <div className={classes.loading}>
+                  <Skeleton count={10}/>
+                </div>
+              }
+              {readyToShow && 
+                    <div className={classes.table}>
+                    <TableContainer component={Paper}>
+                    <Table className={classes.table}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="center" width="50%" style={{fontSize: '13pt'}}>Predict Field</TableCell>
+                          <TableCell align="center" style={{fontSize: '13pt'}}>Result</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {resultRows.map((row) => (
+                          <TableRow key={row.name}>
+                            <TableCell  align="center" style={{fontSize: '12pt'}}>
+                              {row.category}
+                            </TableCell>
+                            <TableCell align="center" style={{fontSize: '12pt'}}>{row.value}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </div>
+              }
               </CardBody>
         </Card>
       </Grid>

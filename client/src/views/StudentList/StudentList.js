@@ -190,6 +190,8 @@ export default function TableList() {
   
   var [data, setData] = useState(state);
 
+  var [allowToUp, setAllowToUp] = useState(0)
+
   //console.log(state)  // A student array
 
   const readExcel = (file) => {
@@ -281,10 +283,8 @@ export default function TableList() {
     restArr.splice(tableID,1)
     console.log(restArr)
     for (let i = 0; i < restArr.length; i++) {
-      console.log("comparing", ndata.studentName, restArr[i].studentName)
       if (ndata.studentName === restArr[i].studentName) {
-        console.log("they are the same: ", ndata.studentName, restArr[i].studentName)
-        allowToUp += 1;
+        setAllowToUp(prevValue => prevValue + 1);
       }
       console.log("allup: ", allowToUp)
     }
@@ -292,20 +292,23 @@ export default function TableList() {
       alert("Fail to update, target student doesn't exist.")
     } else {
     if (allowToUp === 0) {
-      console.log(allowToUp, ndata)
       const dataUpdate = [...data];
       const index = tableID;
       dataUpdate[index] = ndata;
       dispatch(updateStu(ndata, tableID))
       dispatch(upStu(ndata))
       setData([...dataUpdate]);
+      setAllowToUp(0)
     }
     if (allowToUp >= 1) {
       console.log(allowToUp)
       alert("Fail to update, only one student should exist.")
+      setAllowToUp(0)
+
     }
   }
   dispatch(loadStu())
+  setAllowToUp(0)
   }
 
   const addStuViaExcel = () => {

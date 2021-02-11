@@ -231,14 +231,24 @@ export default function CompanyList() {
     })
   }
 
+  var converData = {
+    comName: "",
+    listName: "",
+    sdate: "",
+    edate: ""
+  }
   const readJson = (file) =>{
     const fileReader = new FileReader();
     fileReader.onloadend = ()=>{
        try{
           var obj = JSON.parse(fileReader.result);
-          console.log(obj)
+          alert(obj.action.length," row of data detected.")
+
        }catch(e){
        }
+      //  obj.action.forEach(arr => {
+         
+      //  });
     }
     if( file !== undefined)
        fileReader.readAsText(file);
