@@ -32,6 +32,12 @@ import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import { bugs, website, server } from "variables/general.js";
 import { useSelector } from "react-redux";
+import GoogleLogin from 'react-google-login';
+import GoogleLogout from 'react-google-login';
+import Chart from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+
+
 
 import {
   dailySalesChart,
@@ -80,7 +86,53 @@ export default function Dashboard() {
     comAlert = false
   }
 
+  const responseGoogle = (response) => {
+    console.log(response);
+  }
+
+  const logout = () => {
+    window.location.reload()
+  }
+
   var emRate = (employeedStuNum/activeStuNum).toFixed(2)*100;
+
+  const pData = {
+    labels: [
+      'BA',
+      'Test',
+      'Dev'
+    ],
+    datasets: [{
+      data: [300, 50, 100],
+      backgroundColor: [
+      '#FF6384',
+      '#36A2EB',
+      '#FFCE56'
+      ],
+      hoverBackgroundColor: [
+      '#FF6384',
+      '#36A2EB',
+      '#FFCE56'
+      ]
+    }]
+  };
+
+  const pieData = {
+    series:[
+      {
+        value:20,
+        name:"S1"
+      },
+      {
+        value:20,
+        name:"S1"
+      },
+      {
+        value:60,
+        name:"S1"
+      }
+    ]
+  }
   
   return (
     <div>
@@ -146,6 +198,7 @@ export default function Dashboard() {
           </Card>
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
+        <Doughnut data={pData} />
         </GridItem>
       </GridContainer>
       <GridContainer>
@@ -161,7 +214,7 @@ export default function Dashboard() {
               />
             </CardHeader>
             <CardBody>
-              <h4 className={classes.cardTitle}>Yearly Performance</h4>
+              <h4 className={classes.cardTitle}>Conversion Rate</h4>
               <p className={classes.cardCategory}>
               </p>
             </CardBody>
@@ -196,77 +249,17 @@ export default function Dashboard() {
         </GridItem>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
-            <CardHeader color="danger">
-              <ChartistGraph
-                className="ct-chart"
-                data={completedTasksChart.data}
-                type="Line"
-                options={completedTasksChart.options}
-                listener={completedTasksChart.animation}
-              />
+            <CardHeader color="success">
+            <Doughnut data={pData} />
             </CardHeader>
             <CardBody>
-              <h4 className={classes.cardTitle}>Completed Tasks</h4>
+              <h4 className={classes.cardTitle}>Pie</h4>
             </CardBody>
             <CardFooter chart>
               <div className={classes.stats}>
                 <AccessTime /> Campaign Sent 2 Days Ago
               </div>
             </CardFooter>
-          </Card>
-        </GridItem>
-      </GridContainer>
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={6}>
-          <CustomTabs
-            title="Notes:"
-            headerColor="primary"
-            tabs={[
-              {                
-                tabName: "Company",
-                tabIcon: Code,
-                tabContent: (
-                  <Tasks
-                    checkedIndexes={[0, 3]}
-                    tasksIndexes={[0, 1, 2, 3]}
-                    tasks={bugs}
-                  />
-                ),
-              },
-              {
-                tabName: "Student",
-                tabIcon: Code,
-                tabContent: (
-                  <Tasks
-                    checkedIndexes={[0]}
-                    tasksIndexes={[0, 1]}
-                    tasks={website}
-                  />
-                ),
-              },
-            ]}
-          />
-        </GridItem>
-        <GridItem xs={12} sm={12} md={6}>
-          <Card>
-            <CardHeader color="warning">
-              <h4 className={classes.cardTitleWhite}>Students Stats</h4>
-              <p className={classes.cardCategoryWhite}>
-                New internships on 15th September, 2021
-              </p>
-            </CardHeader>
-            <CardBody>
-              <Table
-                tableHeaderColor="warning"
-                tableHead={["ID", "Name","Company" ,"Location"]}
-                tableData={[
-                  ["1", "Dakota Rice", "The University of Auckland", "Auckland"],
-                  ["2", "Minerva Hooper", "Spark", "Auckland"],
-                  ["3", "Sage Rodriguez", "Orion", "Auckland"],
-                  ["4", "Philip Chaney", "The Tower", "Auckland"],
-                ]}
-              />
-            </CardBody>
           </Card>
         </GridItem>
       </GridContainer>
