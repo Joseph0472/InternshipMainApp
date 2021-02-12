@@ -41,11 +41,19 @@ if (process.env.NODE_ENV === 'production') {
     });
 }
 
-// Connect to DB
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
+//Connect to DB
+mongoose.connect("mongodb+srv://pjia958:Mongo7@cluster0.wwpp1.mongodb.net/interndb?retryWrites=true&w=majority", { useNewUrlParser: true })
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', ()=>console.log('Connected to Database'))
+
+// var MongoClient = require('mongodb').MongoClient;
+// var uri = "mongodb+srv://pjia958:Mongo7@cluster0.wwpp1.mongodb.net/interndb?retryWrites=true&w=majority";
+// MongoClient.connect(uri, function(err, client) {
+//   const collection = client.db("test").collection("devices");
+//   // perform actions on the collection object
+//   client.close();
+// });
 
 // Start the server running. Once the server is running, the given function will be called, which will
 // log a simple message to the server console. Any console.log() statements in your node.js code
