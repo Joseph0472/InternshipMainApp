@@ -5,7 +5,6 @@ import {
     UPDATE_COMPANY,
     ADD_COM_VIA_EXCEL
 } from '../actions/action-types'
-import companyApi from '../../api/company'
 import config from '../../config'
 import { setCom } from '../actions/companyActions'
 

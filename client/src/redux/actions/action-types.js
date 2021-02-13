@@ -9,3 +9,6 @@ export const SET_STUDENTS = "SET_STUDENTS"
 export const DELETE_STUDENT = "DELETE_STUDENT"
 export const UPDATE_STUDENT = "UPDATE_STUDENT"
 export const ADD_STU_VIA_EXCEL = "ADD_STU_VIA_EXCEL"
+
+export const LOG_IN = "LOG_IN"
+export const LOG_OUT = "LOG_OUT"

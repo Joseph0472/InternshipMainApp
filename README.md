@@ -68,3 +68,13 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `yarn build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+Todos:
+MaterialTable ref: https://material-table.com/#/
+Add the full object to dispatch and reducer DONE
+Finish the other three dispatch function, DONE
+Duplicated them to student table, DONE
+Backend, DONE
+Dashboard modi, DONE
+DB...DONE
+Standarize structure Future...

@@ -31,11 +31,14 @@ import CardIcon from "components/Card/CardIcon.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 import { bugs, website, server } from "variables/general.js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from 'react';
 import GoogleLogin from 'react-google-login';
 import GoogleLogout from 'react-google-login';
 import Chart from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
+import { loadCom } from '../../redux/reducers/companyReducer'
+
 
 
 
@@ -50,11 +53,10 @@ import Success from "components/Typography/Success";
 
 const useStyles = makeStyles(styles);
 
-// TODO: All data should be accordingly.
-
 export default function Dashboard() {
   const classes = useStyles();
   const { useState } = React;
+  const dispatch = useDispatch();
   const state = useSelector((state) => state)
 
   var companyNum = state.company.length;
@@ -133,6 +135,15 @@ export default function Dashboard() {
       }
     ]
   }
+
+  const fetchCom = async () => {
+    const company = await dispatch(loadCom())
+    state.company = company
+  }
+
+  useEffect(() => {
+      fetchCom() 
+  },[])
   
   return (
     <div>

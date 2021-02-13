@@ -4,7 +4,7 @@ import { combineReducers } from 'redux'
 import studentReducer from './studentReducer';
 
 const rootReducer = combineReducers({
-    //auth: authReducer,
+    auth: authReducer,
     company: companyReducer,
     student: studentReducer
 });

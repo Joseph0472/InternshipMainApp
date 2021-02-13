@@ -16,20 +16,11 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { useState, useEffect } from 'react';
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import XLSX from 'xlsx'
 import { addCom, deleteCom, updateCom, addComViaExcelFile } from '../../redux/actions/companyActions'
 import { saveCom, loadCom, delCom, upCom, saveExcelCom } from '../../redux/reducers/companyReducer'
 
-// MaterialTable ref: https://material-table.com/#/
-// TODO: Add the full object to dispatch and reducer DONE
-//       Finish the other three dispatch function, DONE
-//       Duplicated them to student table, DONE
-//       Backend, DONE
-//       Dashboard modi, DONE
-//       DB...DONE
-//       Standarize structure
 
 const styles = {
   cardCategoryWhite: {
@@ -237,6 +228,7 @@ export default function CompanyList() {
     sdate: "",
     edate: ""
   }
+  
   const readJson = (file) =>{
     const fileReader = new FileReader();
     fileReader.onloadend = ()=>{
@@ -367,7 +359,7 @@ export default function CompanyList() {
 
   //test
   function handleClick() {
-    console.log(data)
+    console.log(state)
     console.log(excelData)
   }
 
