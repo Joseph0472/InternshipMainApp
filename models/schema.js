@@ -1,6 +1,9 @@
 import mongoose from 'mongoose'
 
 const companySchema = new mongoose.Schema({
+    userEmail: {
+        type: String
+    },
     companyName: {
         type: String,
         required: true
@@ -37,6 +40,9 @@ const companySchema = new mongoose.Schema({
 export const Company = mongoose.model('Company', companySchema)
 
 const studentSchema = new mongoose.Schema({
+    userEmail: {
+        type: String
+    },
     studentName: {
         type: String,
         required: true
@@ -64,6 +70,9 @@ const studentSchema = new mongoose.Schema({
 export const Student = mongoose.model('Student', studentSchema)
 
 const historySchema = new mongoose.Schema({
+    userEmail: {
+        type: String
+    },
     period: {
         type: String,
         required: true,

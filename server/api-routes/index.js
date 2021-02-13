@@ -30,6 +30,7 @@ router.get('/company/:id', getCompany, (req, res) => {
 router.post('/company/', async (req, res) => {
     //TODO: Add a loop to insert an array one by one
     const company = new Company({
+        userEmail: req.body.userEmail,
         companyName: req.body.companyName,
         cPersonName: req.body.cPersonName,
         email: req.body.email,
@@ -51,8 +52,9 @@ router.post('/company/', async (req, res) => {
 
 //Updating one
 router.patch('/company/:id', getCompany, async (req, res) => {
-    const {companyName, cPersonName, email, ifActive, listName, sdate, edate, interest1, interest2, interest3 } = req.body
+    const {companyName, cPersonName, email, ifActive, listName, sdate, edate, interest1, interest2, interest3, userEmail } = req.body
     try {
+        if (userEmail) res.company.userEmail = userEmail;
         if (companyName) res.company.companyName = companyName;
         if (cPersonName) res.company.cPersonName = cPersonName;
         if (email) res.company.email = email;
@@ -100,7 +102,7 @@ async function getCompany(req, res, next) {
     try {
         company = await Company.findById(req.params.id)
         if (company == null) {
-            return res.status(404).json({ message: 'Cannot find student' })
+            return res.status(404).json({ message: 'Cannot find company' })
         }
     } catch (err) {
         return res.status(500).json({ message: err.message })
@@ -134,6 +136,7 @@ router.get('/student/:id', getStudent, (req, res) => {
 router.post('/student/', async (req, res) => {
     //TODO: Add a loop to insert an array one by one
     const student = new Student({
+        userEmail: req.body.userEmail,
         studentName: req.body.studentName,
         email: req.body.email,
         stuState: req.body.stuState,
@@ -152,8 +155,9 @@ router.post('/student/', async (req, res) => {
 
 //Updating one
 router.patch('/student/:id', getStudent, async (req, res) => {
-    const {studentName, email, stuState, interest1, interest2, interest3, note } = req.body
+    const {studentName, email, stuState, interest1, interest2, interest3, note, userEmail } = req.body
     try {
+        if (userEmail) res.student.userEmail = userEmail;
         if (studentName) res.student.studentName = studentName;
         if (email) res.student.email = email;
         if (stuState) res.student.stuState = stuState;

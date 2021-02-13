@@ -20,7 +20,8 @@ const authReducer = (state = {}, action) => {
                 image: payload.image
             };
         case LOG_OUT:
-            return state
+            console.log("Logging out")
+            return {};
         default: 
             return state
     }

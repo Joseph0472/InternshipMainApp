@@ -35,10 +35,9 @@ export default function AdminNavbarLinks() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  const state = useSelector((state) => state)
+  const state = useSelector((state) => state.auth)
 
-
-  const [user, setUser] = useState({name: "", email: "", image: ""})
+  const [user, setUser] = useState(state)
 
   const responseGoogle = async (response) => {
     const profile = await response.getBasicProfile();
@@ -57,15 +56,16 @@ export default function AdminNavbarLinks() {
 
   const logout = () => {
     setUser({name:"", email:"", image:""})
-    dispatch(logOut)
+    dispatch(logOut())
     setIsAuthenticated(false)
   }
-  // console.log("is authenticated? ",isAuthenticated)
+  //console.log("is authenticated? ",isAuthenticated)
   useEffect(() => {
-    if(user.email.length > 0 || user.name.length > 0 ) {
+    console.log(user)
+    if(user.email) {
       setIsAuthenticated(true)
       dispatch(logIn({name: user.name, email: user.email, image: user.image}))
-    }
+    } 
   }, [user])
 
   const handleClick = () => {
@@ -79,7 +79,7 @@ export default function AdminNavbarLinks() {
       </Button>
       {isAuthenticated ? 
       <div>
-      Hello, Joseph
+      Hello! {user.name}
       <img src={user.image} style={{height: 40, width: 40, borderRadius: 50}}/>
       <GoogleLogout
       buttonText="Logout"

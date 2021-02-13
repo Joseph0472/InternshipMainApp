@@ -57,6 +57,7 @@ const useStyles = makeStyles(styles);
 export default function CompanyList() {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth)
   const state = useSelector((state) => state.company)
 
   const [excelData, setExcelData] = useState()
@@ -246,7 +247,8 @@ export default function CompanyList() {
        fileReader.readAsText(file);
  }
 
-  const addCompany = (ndata) => {
+ //TODO: From here, adjust the CRUD by adding a parameter.
+  const addCompany = (ndata, userEmail) => {
     var allowToAdd = true
     for (let i = 0; i < state.length; i++) {
       if (ndata.companyName === state[i].companyName) {
@@ -255,11 +257,11 @@ export default function CompanyList() {
       }
     }
     if (allowToAdd) {
-      dispatch(addCom(ndata))
+      dispatch(addCom(ndata, userEmail))
       dispatch(saveCom())
       setData([...data, ndata]);
     }
-    dispatch(loadCom())
+    dispatch(loadCom(userEmail))
   }
 
   const deleteCompany = (comList, index) => {
@@ -348,6 +350,7 @@ export default function CompanyList() {
   };
 
   useEffect(() => {
+    console.log(auth.email)
     if (!data[0]) {
       fetchCom() 
     }

@@ -110,9 +110,12 @@ export const saveExcelCom = () => async (dispatch, getState) => {
 
 }
 
-export const loadCom = () => async (dispatch, getState) => {
+export const loadCom = (userEmail) => async (dispatch, getState) => {
     const companies = await fetch(config.serverUrl+"/api/company/").then(res => res.json())
     console.log(companies)
+    companies.forEach(company => {
+        // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it        
+    });
     dispatch(setCom(companies))
     return companies
 }

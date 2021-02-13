@@ -15,6 +15,8 @@ import Snackbar from "components/Snackbar/Snackbar.js";
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
+import { useSelector, useDispatch } from "react-redux";
+
 
 const styles = {
   cardCategoryWhite: {
@@ -56,6 +58,12 @@ export default function Upload() {
   const [bl, setBL] = React.useState(false);
   const [bc, setBC] = React.useState(false);
   const [br, setBR] = React.useState(false);
+
+  const state = useSelector((state) => state)
+
+  console.log(state)
+
+  
   React.useEffect(() => {
     // Specify how to clean up after this effect:
     return function cleanup() {

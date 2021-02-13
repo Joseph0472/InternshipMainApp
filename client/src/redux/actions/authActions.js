@@ -18,7 +18,5 @@ export const logIn = (auth) => {
 export const logOut = () => {
     return {
         type: LOG_OUT,
-        payload: {
-        }
     }
 }
