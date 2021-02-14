@@ -26,6 +26,7 @@ const companyReducer = (state = [], action) => {
         case CREATE_COMPANY:
         // console.log(state) ////state is a array of company object
             return [...state, {
+                userEmail: payload.userEmail,
                 companyName: payload.companyName,
                 cPersonName: payload.cPersonName,
                 email: payload.email,
@@ -45,8 +46,6 @@ const companyReducer = (state = [], action) => {
         case UPDATE_COMPANY:
             const dataUpdate = [...state];
             const index = payload.index;
-            // console.log(payload) 
-            //console.log([...state][index])
             dataUpdate[index] = {
                 companyName: payload.companyName,
                 cPersonName: payload.cPersonName,
@@ -78,25 +77,28 @@ const companyReducer = (state = [], action) => {
 
 export default companyReducer
 
-export const saveCom = () => async (dispatch, getState) => {
+export const saveCom = (userEmail) => async (dispatch, getState) => {
     const companies = getState().company
     const index = companies.length - 1
-    //console.log(companies)
-    //TODO: Companies with same name should be not allowed to add done
+    var comToSave = companies[index]
+    comToSave.userEmail = userEmail
+    
     await fetch(config.serverUrl+"/api/company/", {
         method: "POST",
         headers: {
             "Content-type": 'application/json'
         },
-        body: JSON.stringify(companies[index])
+        body: JSON.stringify(comToSave)
     }).then(alert("Company added."))
-    //TODO: FIX the adding companies error when adding consecutively done
 
 }
 
-export const saveExcelCom = () => async (dispatch, getState) => {
+export const saveExcelCom = (userEmail) => async (dispatch, getState) => {
     const companies = getState().company
     const index = companies.length - 1
+    var comToSave = companies[index]
+    comToSave.userEmail = userEmail
+
     //console.log(companies)
     //TODO: Companies with same name should be not allowed to add
     await fetch(config.serverUrl+"/api/company/", {
@@ -104,32 +106,33 @@ export const saveExcelCom = () => async (dispatch, getState) => {
         headers: {
             "Content-type": 'application/json'
         },
-        body: JSON.stringify(companies[index])
+        body: JSON.stringify(comToSave)
     })
     //TODO: FIX the adding companies error when adding consecutively done
 
 }
 
-export const loadCom = (userEmail) => async (dispatch, getState) => {
+export const loadCom = (uEmail) => async (dispatch, getState) => {
     const companies = await fetch(config.serverUrl+"/api/company/").then(res => res.json())
-    console.log(companies)
+    var myCompanies = []
     companies.forEach(company => {
-        // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it        
+        // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it DONE
+        console.log(uEmail)
+        if (company.userEmail === uEmail) {
+            myCompanies.push(company)
+        }        
     });
-    dispatch(setCom(companies))
-    return companies
+    dispatch(setCom(myCompanies))
+    return myCompanies
 }
 
 export const delCom = (id) => async (dispatch, getState) => {
-    // console.log("deleting id: ", id)
     fetch(config.serverUrl+"/api/company/"+id, {
         method: "DELETE"
     })
-    //TODO: RELOAD the companies to maintain the new state DONE
 }
 
 export const upCom = (nrow) => async (dispatch, getState) => {
-    console.log("updating: ", nrow)
     await fetch(config.serverUrl+"/api/company/"+nrow._id, {
         method: "PATCH",
         headers: {
@@ -137,6 +140,5 @@ export const upCom = (nrow) => async (dispatch, getState) => {
         },
         body: JSON.stringify(nrow)
     }).then(alert("Company updated."))
-    //TODO: RELOAD the companies to maintain the new state DONE
 }
 

@@ -6,10 +6,11 @@ import {
     UPDATE_COMPANY
 } from './action-types'
 
-export const addCom = (ndata) => {
+export const addCom = (ndata, uEmail) => {
     return {
         type: CREATE_COMPANY,
         payload: {
+            userEmail: uEmail,
             companyName: ndata.companyName,
             cPersonName: ndata.cPersonName,
             email: ndata.email,

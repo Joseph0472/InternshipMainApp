@@ -6,10 +6,11 @@ import {
     ADD_STU_VIA_EXCEL
 } from '../actions/action-types'
 
-export const addStu = (ndata) => {
+export const addStu = (ndata, uEmail) => {
     return {
         type: CREATE_STUDENT,
         payload: {
+            userEmail: uEmail,
             studentName: ndata.studentName,
             email: ndata.email,
             stuState: ndata.stuState,

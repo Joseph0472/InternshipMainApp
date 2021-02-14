@@ -78,3 +78,6 @@ Backend, DONE
 Dashboard modi, DONE
 DB...DONE
 Standarize structure Future...
+    //TODO: FIX the adding companies error when adding consecutively done
+    //TODO: Companies with same name should be not allowed to add done
+

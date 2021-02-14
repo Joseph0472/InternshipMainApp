@@ -4,7 +4,6 @@ import {
 } from './action-types'
 
 export const logIn = (auth) => {
-    console.log(auth)
     return {
         type: LOG_IN,
         payload: {

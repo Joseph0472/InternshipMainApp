@@ -53,12 +53,13 @@ router.post('/company/', async (req, res) => {
 //Updating one
 router.patch('/company/:id', getCompany, async (req, res) => {
     const {companyName, cPersonName, email, ifActive, listName, sdate, edate, interest1, interest2, interest3, userEmail } = req.body
+    console.log(ifActive !== res.company.ifActive)
     try {
         if (userEmail) res.company.userEmail = userEmail;
         if (companyName) res.company.companyName = companyName;
         if (cPersonName) res.company.cPersonName = cPersonName;
         if (email) res.company.email = email;
-        if (ifActive) res.company.ifActive = ifActive;
+        if (ifActive !== res.company.ifActive) res.company.ifActive = ifActive;
         if (listName) res.company.listName = listName;
         if (sdate) res.company.sdate = sdate;
         if (edate) res.company.edate = edate;

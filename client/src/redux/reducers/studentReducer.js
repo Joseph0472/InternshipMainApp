@@ -24,6 +24,7 @@ const studentReducer = (state = [], action) => {
         case CREATE_STUDENT:
         // console.log(state) ////state is a array of student object
             return [...state, {
+                userEmail: payload.userEmail,
                 studentName: payload.studentName,
                 email: payload.email,
                 stuState: payload.stuState,
@@ -40,8 +41,6 @@ const studentReducer = (state = [], action) => {
         case UPDATE_STUDENT:
             const dataUpdate = [...state];
             const index = payload.index;
-            // console.log(payload) 
-            //console.log([...state][index])
             dataUpdate[index] = {
                 studentName: payload.studentName,
                 email: payload.email,
@@ -71,55 +70,59 @@ const studentReducer = (state = [], action) => {
 
 export default studentReducer
 
-export const saveStu = () => async (dispatch, getState) => {
+export const saveStu = (userEmail) => async (dispatch, getState) => {
     const students = getState().student
     const index = students.length - 1
-    //console.log(students)
-    //TODO: Students with same name should be not allowed to add done
+    var stuToSave = students[index]
+    stuToSave.userEmail = userEmail
+
     await fetch(config.serverUrl+"/api/student/", {
         method: "POST",
         headers: {
             "Content-type": 'application/json'
         },
-        body: JSON.stringify(students[index])
+        body: JSON.stringify(stuToSave)
     }).then(alert("Student added."))
-    //TODO: FIX the adding students error when adding consecutively done
 
 }
 
-export const saveExcelStu = () => async (dispatch, getState) => {
+export const saveExcelStu = (userEmail) => async (dispatch, getState) => {
     const students = getState().student
     const index = students.length - 1
-    //console.log(students)
-    //TODO: Students with same name should be not allowed to add
+    var stuToSave = students[index]
+    stuToSave.userEmail = userEmail
+
     await fetch(config.serverUrl+"/api/student/", {
         method: "POST",
         headers: {
             "Content-type": 'application/json'
         },
-        body: JSON.stringify(students[index])
+        body: JSON.stringify(stuToSave)
     })
-    //TODO: FIX the adding students error when adding consecutively done
 
 }
 
-export const loadStu = () => async (dispatch, getState) => {
+export const loadStu = (uEmail) => async (dispatch, getState) => {
     const students = await fetch(config.serverUrl+"/api/student/").then(res => res.json())
-    //console.log(students)
-    dispatch(setStu(students))
-    return students
+    var myStus = []
+    students.forEach(student => {
+        // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it DONE
+        console.log(uEmail)
+        if (student.userEmail === uEmail) {
+            myStus.push(student)
+        }        
+    });
+    dispatch(setStu(myStus))
+    return myStus
 }
 
 export const delStu = (id) => async (dispatch, getState) => {
-    // console.log("deleting id: ", id)
     fetch(config.serverUrl+"/api/student/"+id, {
         method: "DELETE"
     })
-    //TODO: RELOAD the students to maintain the new state DONE
 }
 
 export const upStu = (nrow) => async (dispatch, getState) => {
-    console.log("updating: ", nrow)
     await fetch(config.serverUrl+"/api/student/"+nrow._id, {
         method: "PATCH",
         headers: {
@@ -127,6 +130,5 @@ export const upStu = (nrow) => async (dispatch, getState) => {
         },
         body: JSON.stringify(nrow)
     }).then(alert("Student info updated."))
-    //TODO: RELOAD the students to maintain the new state DONE
 }
 

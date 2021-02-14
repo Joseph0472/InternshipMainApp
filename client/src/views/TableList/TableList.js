@@ -20,6 +20,9 @@ import { useSelector, useDispatch } from "react-redux";
 import XLSX from 'xlsx'
 import { addCom, deleteCom, updateCom, addComViaExcelFile } from '../../redux/actions/companyActions'
 import { saveCom, loadCom, delCom, upCom, saveExcelCom } from '../../redux/reducers/companyReducer'
+import json2xls from 'json2xls'
+import exportFromJSON from 'export-from-json'
+import { object } from "prop-types";
 
 
 const styles = {
@@ -216,6 +219,7 @@ export default function CompanyList() {
         window.location.reload()
       };
     });
+
     promise.then((d)=>{
       console.log(d)
       setOpen(true)
@@ -223,31 +227,93 @@ export default function CompanyList() {
     })
   }
 
-  var converData = {
-    comName: "",
-    listName: "",
-    sdate: "",
-    edate: ""
+  var recArr = []
+  var exportArr = []
+                      
+  function createRec(listName, cardName, cDate) {
+    var objR = new Object()
+    objR.listName = listName
+    objR.cardName = cardName
+    objR.cDate = cDate
+    return objR
+  }
+  function createThis(listName, cardName, sDate, eDate) {
+    var objT = new Object()
+    objT.listName = listName
+    objT.cardName = cardName
+    objT.sDate = sDate
+    objT.eDate = eDate
+    return objT
   }
   
   const readJson = (file) =>{
+    var commentInfoArr = []
+    const promise = new Promise((res, rej) => {
     const fileReader = new FileReader();
     fileReader.onloadend = ()=>{
        try{
           var obj = JSON.parse(fileReader.result);
-          alert(obj.action.length," row of data detected.")
+          console.log(obj)
 
+          obj.actions.forEach(act => {
+            if (act.type === "commentCard") {
+              commentInfoArr.push(act)
+            }
+          });
+          alert(commentInfoArr.length+" rows of data detected.")
+          res(commentInfoArr)
        }catch(e){
+          alert(e)
        }
-      //  obj.action.forEach(arr => {
-         
-      //  });
     }
     if( file !== undefined)
        fileReader.readAsText(file);
+      });
+
+    promise.then((infoArr)=>{
+      var obj = createRec(infoArr[0].data.list.name, infoArr[0].data.card.name, infoArr[0].date.substring(0,10))
+      infoArr.forEach(act => {
+        recArr.push(createRec(act.data.list.name, act.data.card.name, act.date.substring(0,10)))      
+      });
+      console.log(recArr)
+
+      //early date late date
+      for(let i = 0; i<recArr.length; i++) {
+        var thisSdate, thisEdate, thisCardN, thisListN
+        thisListN = recArr[i].listName
+        thisCardN = recArr[i].cardName
+        if (recArr[i+1]) {
+          // solving sdate problem
+          if(recArr[i+1].cardName === thisCardN) { //if it's in same card
+            if (recArr[i].cDate !== recArr[i+1].cDate) {
+              thisSdate = recArr[i].cDate
+            }
+          } else {
+            thisEdate = recArr[i].cDate
+            console.log("list: ",thisListN,"card: ", thisCardN,"date: ", thisSdate, thisEdate)
+            exportArr.push(createThis(thisListN, thisCardN, thisSdate, thisEdate))
+            thisSdate = recArr[i+1].cDate
+          }
+        //==================
+        }
+      }
+
+      var date = new Date()
+      var dateStr = date.toLocaleDateString()
+      var downLoadWB = XLSX.utils.book_new()
+      var downLoadWS = XLSX.utils.json_to_sheet(exportArr)
+      XLSX.utils.book_append_sheet(downLoadWB, downLoadWS)
+      XLSX.writeFile(downLoadWB, dateStr+"_TrelloData.xlsx")
+      
+    })
+
+    // console.log(commentInfoArr)
+    // commentInfoArr.forEach(act => {
+    //   console.log(act.date)
+    // });
  }
 
- //TODO: From here, adjust the CRUD by adding a parameter.
+ //TODO: From here, adjust the CRUD by adding a parameter. DONE
   const addCompany = (ndata, userEmail) => {
     var allowToAdd = true
     for (let i = 0; i < state.length; i++) {
@@ -258,10 +324,10 @@ export default function CompanyList() {
     }
     if (allowToAdd) {
       dispatch(addCom(ndata, userEmail))
-      dispatch(saveCom())
+      dispatch(saveCom(userEmail))
       setData([...data, ndata]);
     }
-    dispatch(loadCom(userEmail))
+    dispatch(loadCom(auth.email))
   }
 
   const deleteCompany = (comList, index) => {
@@ -281,17 +347,17 @@ export default function CompanyList() {
       }
     }
     //if duplicated
-    console.log(ndata)
+    // console.log(ndata)
     var restArr = state
     restArr.splice(tableID,1)
     console.log(restArr)
     for (let i = 0; i < restArr.length; i++) {
-      console.log("comparing", ndata.companyName, restArr[i].companyName)
+      // console.log("comparing", ndata.companyName, restArr[i].companyName)
       if (ndata.companyName === restArr[i].companyName) {
-        console.log("they are the same: ", ndata.companyName, restArr[i].companyName)
+        // console.log("they are the same: ", ndata.companyName, restArr[i].companyName)
         allowToUp += 1;
       }
-      console.log("allup: ", allowToUp)
+      // console.log("allup: ", allowToUp)
     }
     if (!ifNew) {
       alert("Fail to update, target company doesn't exist.")
@@ -303,14 +369,14 @@ export default function CompanyList() {
       dataUpdate[index] = ndata;
       dispatch(updateCom(ndata, tableID))
       dispatch(upCom(ndata))
-      setData([...dataUpdate]);
+      //setData([...dataUpdate]);
     }
     if (allowToUp >= 1) {
       console.log(allowToUp)
       alert("Fail to update, only one company should exist.")
     }
   }
-  dispatch(loadCom())
+  dispatch(loadCom(auth.email))
   }
 
   const addComViaExcel = () => {
@@ -334,8 +400,8 @@ export default function CompanyList() {
             dispatch(delCom(originTableData[originTableData[k].tableData.id]._id))
           }
         }
-          dispatch(addCom(excelData[i]))
-          dispatch(saveExcelCom())
+          dispatch(addCom(excelData[i], auth.email))
+          dispatch(saveExcelCom(auth.email))
           setData([...data, excelData[i]]);
       }
     //console.log("data: ",data)
@@ -350,7 +416,6 @@ export default function CompanyList() {
   };
 
   useEffect(() => {
-    console.log(auth.email)
     if (!data[0]) {
       fetchCom() 
     }
@@ -360,14 +425,17 @@ export default function CompanyList() {
     window.location.reload()
   }
 
-  //test
   function handleClick() {
-    console.log(state)
-    console.log(excelData)
+    var date = new Date()
+    var dateStr = date.toLocaleDateString()
+    var downLoadWB = XLSX.utils.book_new()
+    var downLoadWS = XLSX.utils.json_to_sheet(data)
+    XLSX.utils.book_append_sheet(downLoadWB, downLoadWS)
+    XLSX.writeFile(downLoadWB, dateStr+"_CompanyInfo.xlsx")
   }
 
   const fetchCom = async () => {
-    const company = await dispatch(loadCom())
+    const company = await dispatch(loadCom(auth.email))
     setData(company)
   }
 
@@ -390,7 +458,7 @@ export default function CompanyList() {
         onRowAdd: newData =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              addCompany(newData);
+              addCompany(newData, auth.email);
               resolve();
             }, 1000)
           }),
@@ -400,7 +468,7 @@ export default function CompanyList() {
               const dataUpdate = [...data];
               const index = oldData.tableData.id;
               dataUpdate[index] = newData;
-              //setData([...dataUpdate]);
+              setData([...dataUpdate]);
               updateCompany(newData, index)
               resolve();
             }, 1000)
@@ -425,7 +493,7 @@ export default function CompanyList() {
         color="primary"
         component="label"
         >
-        Upload Excel File
+        Import Excel Info
         <input
           type="file"
           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -436,14 +504,20 @@ export default function CompanyList() {
           hidden
         />
         </Button>
+        <Button 
+                color="primary"
+                onClick={handleClick}>
+          Download Table
+        </Button>
         <Button
         variant="contained"
         color="info"
         component="label"
         >
-        Upload Json File frim Trello
+        Get Conversation Info From Trello File
         <input
           type="file"
+          accept="application/JSON"
           onChange = {(e)=>{
             const file = e.target.files[0];
             readJson(file);
@@ -451,9 +525,7 @@ export default function CompanyList() {
           hidden
         />
         </Button>
-        <Button onClick={handleClick}>
-          getAllCompany
-        </Button>
+
 
           <Dialog
           open={open}

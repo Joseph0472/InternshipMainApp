@@ -136,6 +136,7 @@ const useStyles = makeStyles(styles);
 export default function ForecastingPage() {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth)
   const state = useSelector((state) => state)
   // console.log(state) //{company: Array(52), student: Array(24)}
   const [data, setData] = useState(0)
@@ -233,6 +234,7 @@ export default function ForecastingPage() {
   const hisData = [[30,166], [27,171], [30,110], [25,132], [36, 327]]
 
   function handleForecast(){
+    console.log(foreData)
     const result = regression.linear(hisData);
     const gradient = result.equation[0];
     const yIntercept = result.equation[1];
@@ -263,7 +265,7 @@ export default function ForecastingPage() {
 
     var comForFNum = Math.ceil(sortedArr[0]/activeStuNum * predictedTotalCom)
     //console.log(lookup[fstPopInt]) worked
-    //console.log(sortedArr[0]) worked
+    console.log(predictedTotalCom)
     console.log(comForFNum)//TODO: fix the relation here
     var comForSNum = Math.ceil(sortedArr[1]/activeStuNum * predictedTotalCom)
     var comForTNum = Math.ceil(sortedArr[2]/activeStuNum * predictedTotalCom)
@@ -271,12 +273,16 @@ export default function ForecastingPage() {
     setForeRes({...foreRes, totalComNeed: predictedTotalCom, interestedCom: interestedComNum, onBoardCom: onBoardcomNum, fstPopularInt: fstPopInt, secPopularInt: secPopInt, thdPopularInt: thdPopInt, comForFst: comForFNum,comForSec: comForSNum, comForThd: comForTNum})
     console.log(foreRes)
 
+    if (predictedTotalCom < 0) {
+      alert("Fail: Can't proceed the forecasting, please get more active companies.")
+      window.location.reload()
+    }
     setReadyToShow(false)
     setLoading(true)
     setTimeout(() => {
       setLoading(false)
       setReadyToShow(true)
-    }, 3000)
+    }, 2000)
 
   }
 
@@ -290,6 +296,14 @@ export default function ForecastingPage() {
     createResultData("Companies interested in "+lookup[foreRes.thdPopularInt]+" need to be reach out", foreRes.comForThd)
     //custmized colum name
   ]
+
+  
+  const fetchInfo = async () => {
+    const company = await dispatch(loadCom(auth.email))
+    const student = await dispatch(loadStu(auth.email))
+    state.company = company
+    state.student = student
+  }
   
   useEffect(() => {
       fetchInfo()
@@ -322,7 +336,6 @@ export default function ForecastingPage() {
          }
        });
        setForeData({...foreData, totalComNum: totalCom, activeComNum: activeCom, totalStuNum: totalStu, stuSeekingForInterNum: stuSeekingForInter, stuWaitingForResNum: stuWaitingForRes, stuGotTheInterNum: stuGotTheInter})
-    // }
   },[])
 
   function handleInPara(e) {
@@ -342,13 +355,6 @@ export default function ForecastingPage() {
     }
   }
 
-  const fetchInfo = async () => {
-    const companies = await dispatch(loadCom())
-    const students = await dispatch(loadStu())
-    console.log(companies)
-    setData(1)
-    console.log(data)
-  }
   
 
 

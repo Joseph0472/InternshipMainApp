@@ -185,7 +185,7 @@ export default function TableList() {
   const [open, setOpen] = React.useState(false);
 
   const [excelData, setExcelData] = useState()
-
+  const auth = useSelector((state) => state.auth)
   const state = useSelector((state) => state.student)
   
   var [data, setData] = useState(state);
@@ -245,7 +245,7 @@ export default function TableList() {
        fileReader.readAsText(file);
  }
 
-  const addStudent = (ndata) => {
+  const addStudent = (ndata, userEmail) => {
     var allowToAdd = true
     for (let i = 0; i < state.length; i++) {
       if (ndata.studentName === state[i].studentName) {
@@ -254,11 +254,11 @@ export default function TableList() {
       }
     }
     if (allowToAdd) {
-      dispatch(addStu(ndata))
-      dispatch(saveStu())
+      dispatch(addStu(ndata, userEmail))
+      dispatch(saveStu(userEmail))
       setData([...data, ndata]);
     }
-    dispatch(loadStu())
+    dispatch(loadStu(auth.email))
   }
 
   const deleteStudent = (stuList, index) => {
@@ -297,7 +297,6 @@ export default function TableList() {
       dataUpdate[index] = ndata;
       dispatch(updateStu(ndata, tableID))
       dispatch(upStu(ndata))
-      setData([...dataUpdate]);
       setAllowToUp(0)
     }
     if (allowToUp >= 1) {
@@ -307,7 +306,7 @@ export default function TableList() {
 
     }
   }
-  dispatch(loadStu())
+  dispatch(loadStu(auth.email))
   setAllowToUp(0)
   }
 
@@ -332,8 +331,8 @@ export default function TableList() {
             dispatch(delStu(originTableData[originTableData[k].tableData.id]._id))
           }
         }
-          dispatch(addStu(excelData[i]))
-          dispatch(saveExcelStu())
+          dispatch(addStu(excelData[i], auth.email))
+          dispatch(saveExcelStu(auth.email))
           setData([...data, excelData[i]]);
       }
     //console.log("data: ",data)
@@ -359,12 +358,16 @@ export default function TableList() {
 
   //test
   function handleClick() {
-    console.log(data)
-    console.log(excelData)
+    var date = new Date()
+    var dateStr = date.toLocaleDateString()
+    var downLoadWB = XLSX.utils.book_new()
+    var downLoadWS = XLSX.utils.json_to_sheet(data)
+    XLSX.utils.book_append_sheet(downLoadWB, downLoadWS)
+    XLSX.writeFile(downLoadWB, dateStr+"_StudentInfo.xlsx")
   }
 
   const fetchStu = async () => {
-    const student = await dispatch(loadStu())
+    const student = await dispatch(loadStu(auth.email))
     setData(student)
   }
 
@@ -387,7 +390,7 @@ export default function TableList() {
         onRowAdd: newData =>
           new Promise((resolve, reject) => {
             setTimeout(() => {
-              addStudent(newData);
+              addStudent(newData, auth.email);
               resolve();
             }, 1000)
           }),
@@ -397,7 +400,7 @@ export default function TableList() {
               const dataUpdate = [...data];
               const index = oldData.tableData.id;
               dataUpdate[index] = newData;
-              //setData([...dataUpdate]);
+              setData([...dataUpdate]);
               updateStudent(newData, index)
               resolve();
             }, 1000)
@@ -422,7 +425,7 @@ export default function TableList() {
         color="primary"
         component="label"
         >
-        Upload Excel File
+        Import Excel Info
         <input
           type="file"
           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -433,23 +436,10 @@ export default function TableList() {
           hidden
         />
         </Button>
-        <Button
-        variant="contained"
-        color="info"
-        component="label"
-        >
-        Upload Json File frim Trello
-        <input
-          type="file"
-          onChange = {(e)=>{
-            const file = e.target.files[0];
-            readJson(file);
-          }}
-          hidden
-        />
-        </Button>
-        <Button onClick={handleClick}>
-          getAllStudent
+        <Button 
+                color="primary"
+                onClick={handleClick}>
+          Download Table
         </Button>
 
           <Dialog

@@ -38,6 +38,7 @@ import GoogleLogout from 'react-google-login';
 import Chart from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { loadCom } from '../../redux/reducers/companyReducer'
+import { loadStu } from '../../redux/reducers/studentReducer'
 
 
 
@@ -57,6 +58,7 @@ export default function Dashboard() {
   const classes = useStyles();
   const { useState } = React;
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth)
   const state = useSelector((state) => state)
 
   var companyNum = state.company.length;
@@ -70,13 +72,13 @@ export default function Dashboard() {
     });
 
   state.student.forEach(function(item,index) {
-      if(item.state !== 0){
+      if(item.stuState === 1 || item.stuState === 2){
         activeStuNum++;
       }
   });
 
   state.student.forEach(function(item,index) {
-    if(item.state == 3){
+    if(item.stuState === 3){
       employeedStuNum++;
     }
   });
@@ -136,13 +138,15 @@ export default function Dashboard() {
     ]
   }
 
-  const fetchCom = async () => {
-    const company = await dispatch(loadCom())
+  const fetchInfo = async () => {
+    const company = await dispatch(loadCom(auth.email))
+    const student = await dispatch(loadStu(auth.email))
     state.company = company
+    state.student = student
   }
 
   useEffect(() => {
-      fetchCom() 
+      fetchInfo() 
   },[])
   
   return (

@@ -61,7 +61,6 @@ export default function AdminNavbarLinks() {
   }
   //console.log("is authenticated? ",isAuthenticated)
   useEffect(() => {
-    console.log(user)
     if(user.email) {
       setIsAuthenticated(true)
       dispatch(logIn({name: user.name, email: user.email, image: user.image}))
