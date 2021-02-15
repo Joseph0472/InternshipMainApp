@@ -117,7 +117,6 @@ export const loadCom = (uEmail) => async (dispatch, getState) => {
     var myCompanies = []
     companies.forEach(company => {
         // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it DONE
-        console.log(uEmail)
         if (company.userEmail === uEmail) {
             myCompanies.push(company)
         }        
