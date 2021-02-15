@@ -49,14 +49,14 @@ const dashboardRoutes = [
     component: DashboardPage,
     layout: "/admin"
   },
-  {
-    path: "/user",
-    name: "User Profile",
-    rtlName: "ملف تعريفي للمستخدم",
-    icon: Person,
-    component: UserProfile,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/user",
+  //   name: "User Profile",
+  //   rtlName: "ملف تعريفي للمستخدم",
+  //   icon: Person,
+  //   component: UserProfile,
+  //   layout: "/admin"
+  // },
   {
     path: "/companytable",
     name: "Company List",
@@ -81,30 +81,30 @@ const dashboardRoutes = [
     component: Forecasting,
     layout: "/admin"
   },
-  {
-    path: "/icons",
-    name: "Icons",
-    rtlName: "الرموز",
-    icon: BubbleChart,
-    component: Icons,
-    layout: "/admin"
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    rtlName: "إخطارات",
-    icon: Notifications,
-    component: NotificationsPage,
-    layout: "/admin"
-  },
-  {
-    path: "/upload",
-    name: "Upload from Trello",
-    rtlName: "إخطارات",
-    icon: Notifications,
-    component: Upload,
-    layout: "/admin"
-  }
+  // {
+  //   path: "/icons",
+  //   name: "Icons",
+  //   rtlName: "الرموز",
+  //   icon: BubbleChart,
+  //   component: Icons,
+  //   layout: "/admin"
+  // },
+  // {
+  //   path: "/notifications",
+  //   name: "Notifications",
+  //   rtlName: "إخطارات",
+  //   icon: Notifications,
+  //   component: NotificationsPage,
+  //   layout: "/admin"
+  // },
+  // {
+  //   path: "/upload",
+  //   name: "Upload from Trello",
+  //   rtlName: "إخطارات",
+  //   icon: Notifications,
+  //   component: Upload,
+  //   layout: "/admin"
+  // }
 ];
 
 export default dashboardRoutes;

@@ -20,12 +20,24 @@ import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
 import { useState, useEffect } from 'react';
 
-import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
+// import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
 import { GoogleLogout } from 'react-google-login'
 import { GoogleLogin } from 'react-google-login';
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { logIn, logOut } from '../../redux/actions/authActions'
+import Grid from '@material-ui/core/Grid';
+
+
+const styles = {
+  root: {
+    width:500,
+    // height:
+  },
+  paper: {
+    textAlign: 'center',
+  },
+}
 
 const useStyles = makeStyles(styles);
 
@@ -33,6 +45,7 @@ export default function AdminNavbarLinks() {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const state = useSelector((state) => state.auth)
@@ -54,6 +67,7 @@ export default function AdminNavbarLinks() {
     })
   }
 
+  
   const logout = () => {
     setUser({name:"", email:"", image:""})
     dispatch(logOut())
@@ -73,31 +87,32 @@ export default function AdminNavbarLinks() {
 
   return (
     <div>
-      <Button onClick={handleClick}>
-        state
-      </Button>
-      {isAuthenticated ? 
-      <div>
-      Hello! {user.name}
-      <img src={user.image} style={{height: 40, width: 40, borderRadius: 50}}/>
-      <GoogleLogout
-      buttonText="Logout"
-      clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
-      onLogoutSuccess={logout}
-      />
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </div>
-      :
-      <div className={classes.searchWrapper}>
-        <GoogleLogin
-            clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
-            buttonText="Login"
-            onSuccess={responseGoogle}
-            cookiePolicy={'single_host_origin'}
-        >Log in</GoogleLogin>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      </div>
-    }
+        {isAuthenticated ? 
+          <div className={classes.root}>
+            <Grid item xs className={classes.paper}>
+              Hello, {user.name}
+              <img src={user.image} style={{height: 40, width: 40, borderRadius: 50}}/>
+              </Grid>
+              <Grid item xs className={classes.paper}>
+              <GoogleLogout
+              buttonText="Logout"
+              clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
+              onLogoutSuccess={logout}
+              />
+              </Grid>
+            </div>
+            :
+            <div>
+              <Grid item xs={6} className={classes.paper}>
+                <GoogleLogin
+                    clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
+                    buttonText="Login"
+                    onSuccess={responseGoogle}
+                    cookiePolicy={'single_host_origin'}
+                >Log in</GoogleLogin>
+              </Grid>
+          </div>
+        }
     </div>
   );
 }

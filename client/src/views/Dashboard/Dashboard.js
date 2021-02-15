@@ -213,7 +213,21 @@ export default function Dashboard() {
           </Card>
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
-        <Doughnut data={pData} />
+        <Card>
+            <CardHeader color="info" stats icon>
+              <CardIcon color="info">
+                <Icon>send</Icon>
+              </CardIcon>
+              <p className={classes.cardCategory}>Employment rate</p>
+              <h3 className={classes.cardTitle}>{emRate}%</h3>
+            </CardHeader>
+            <CardFooter stats>
+            <div className={classes.stats}>
+                <Sync />
+                Percentage of employed students
+              </div>
+            </CardFooter>
+          </Card>
         </GridItem>
       </GridContainer>
       <GridContainer>
