@@ -26,3 +26,17 @@ PATCH  http://localhost:10000/api/student/60211eca60b49336d4acdd68
 Content-Type: application/json
 
 {"studentName":"Vick", "note":"She's good"}
+
+###
+POST http://localhost:10000/api/history/
+Content-Type: application/json
+
+{ 
+    "userEmail": "hahaha@haha.com",
+    "period": "2020S1",
+    "stuNum": 30,
+    "comNum":170
+    }
+
+###
+GET http://localhost:10000/api/history

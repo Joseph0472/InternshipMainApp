@@ -107,7 +107,6 @@ export const loadStu = (uEmail) => async (dispatch, getState) => {
     var myStus = []
     students.forEach(student => {
         // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it DONE
-        console.log(uEmail)
         if (student.userEmail === uEmail) {
             myStus.push(student)
         }        
@@ -131,4 +130,22 @@ export const upStu = (nrow) => async (dispatch, getState) => {
         body: JSON.stringify(nrow)
     }).then(alert("Student info updated."))
 }
+
+
+export const deleteAllStu = (data, email) => async (dispatch, getState) => {
+
+    // console.log(data, email)
+    // data.forEach(stu => {
+    //     fetch(config.serverUrl+"/api/student/"+stu._id, {
+    //         method: "DELETE"
+    //     })
+    // });
+    
+  await Promise.all(data.map(async (stu) => {
+    await fetch(config.serverUrl+"/api/student/"+stu._id, {
+        method: "DELETE"
+    })
+  }));
+}
+
 

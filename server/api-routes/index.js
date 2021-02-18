@@ -1,6 +1,6 @@
 import express from 'express';
 import { PythonShell } from 'python-shell';
-import { Company, Student } from '../../models/schema'
+import { Company, Student, HisData} from '../../models/schema'
 const router = express.Router();
 //Restful Server Api
 
@@ -212,6 +212,65 @@ async function getStudent(req, res, next) {
     res.student = student
     next()
 }
+
+/* 
+========================================================
+HISTORICAL API
+========================================================
+*/
+//Getting all
+router.get('/history/', async (req, res) => {
+    console.log("getting")
+    try {
+        const hisDatas = await HisData.find()
+        res.json(hisDatas)
+    } catch (err) {
+        res.status(500).json({ message: err.message })
+    }
+})
+
+// Add One
+router.post('/history/', async (req, res) => {
+    const hisData = new HisData({
+        userEmail: req.body.userEmail,
+        period: req.body.period,
+        stuNum: req.body.stuNum,
+        comNum: req.body.comNum
+    })
+    try {
+        const newHis = await hisData.save()
+        res.status(201).json(newHis)
+    } catch (err) {
+        res.status(400).json({ message: err.message })
+    }
+})
+
+//Deleting one
+router.delete('/history/:id', getHis, async (req, res) => {
+    try {
+        await res.hisdata.remove()
+        res.json({ message: 'Historical Data Deleted' })
+    } catch (err) {
+        res.status(500).json({ message: err.message })
+    }
+})
+
+//middleware
+async function getHis(req, res, next) {
+    let hisdata
+    try {
+        hisdata = await HisData.findById(req.params.id)
+        if (hisdata == null) {
+            return res.status(404).json({ message: 'Cannot find the student' })
+        }
+    } catch (err) {
+        return res.status(500).json({ message: err.message })
+    }
+
+    res.hisdata = hisdata
+    next()
+}
+
 
 
 export default router;

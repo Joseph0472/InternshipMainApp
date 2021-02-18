@@ -20,7 +20,9 @@ import { useDispatch } from "react-redux";
 import { useState, useEffect } from 'react';
 import XLSX from 'xlsx'
 import { addStu, deleteStu, updateStu, addStuViaExcelFile } from '../../redux/actions/studentActions'
-import { saveStu, loadStu, delStu, upStu, saveExcelStu } from '../../redux/reducers/studentReducer'
+import { saveStu, loadStu, delStu, upStu, saveExcelStu, deleteAllStu } from '../../redux/reducers/studentReducer'
+import LinearProgress from '@material-ui/core/LinearProgress';
+
 
 // MaterialTable ref: https://material-table.com/#/
 // TODO: Add the full object to dispatch and reducer DONE
@@ -65,6 +67,10 @@ export default function TableList() {
   const classes = useStyles();
   const { useState } = React;
   const dispatch = useDispatch();
+  const [delOpen, setDelOpen] = useState(false);
+  const [waiting, setWaiting] = useState(false)
+
+
 
   const [columns, setColumns] = useState([
     { title: 'Student Name', field: 'studentName' },
@@ -79,34 +85,38 @@ export default function TableList() {
       field: 'interest1',
       lookup: {
         0: 'No Preference',
-        1: 'AI/Machine Learning',
-        2: 'Architercture Policy and Planning',
-        3: 'Automation of Processes',
-        4: 'Business Analytics',
-        5: 'Blockchain',
-        6: 'CCTV Analytics Build',
-        7: 'Chatbots',
-        8: 'Cloud',
-        9: 'CMS',
-        10: 'Consultancy',
-        11: 'Data Analytics',
-        12: 'Data Mining and Big Data',
-        13: 'Data Visualisation',
-        14: 'Databases',
-        15: 'Development',
-        16: 'Game Development',
-        17: 'Graphics',
-        18: 'Health Informatics',
-        19: 'Information and Data Governanace',
-        20: 'IoT Scoping',
-        21: 'Statistical Modeling and Anlaysis by ML',
-        22: 'Networking Security',
-        23: 'Networking Services',
-        24: 'Project Management',
-        25: 'Robotics',
-        26: 'Telecommunication',
-        27: 'Testing/QA',
-        28: 'UI/UX'
+        1: 'Accounting',
+        2: 'AI/Machine Learning',
+        3: 'Architercture Policy and Planning',
+        4: 'Automation of Processes',
+        5: 'Business Analytics',
+        6: 'Blockchain',
+        7: 'CCTV Analytics Build',
+        8: 'Chatbots',
+        9: 'Cloud',
+        10: 'CMS',
+        11: 'Consultancy',
+        12: 'Data Analytics',
+        13: 'Data Mining and Big Data',
+        14: 'Data Visualisation',
+        15: 'Databases',
+        16: 'Development',
+        17: 'Game Development',
+        18: 'Graphics',
+        19: 'Health Informatics',
+        20: 'Human Resources',
+        21: 'Information and Data Governanace',
+        22: 'International Business',
+        23: 'IoT Scoping',
+        24: 'Statistical Modeling and Anlaysis by ML',
+        25: 'Marketing',
+        26: 'Networking Security',
+        27: 'Networking Services',
+        28: 'Project Management',
+        29: 'Robotics',
+        30: 'Telecommunication',
+        31: 'Testing/QA',
+        32: 'UI/UX'
     },
     },
     {
@@ -114,34 +124,38 @@ export default function TableList() {
       field: 'interest2',
       lookup: {
         0: 'No Preference',
-        1: 'AI/Machine Learning',
-        2: 'Architercture Policy and Planning',
-        3: 'Automation of Processes',
-        4: 'Business Analytics',
-        5: 'Blockchain',
-        6: 'CCTV Analytics Build',
-        7: 'Chatbots',
-        8: 'Cloud',
-        9: 'CMS',
-        10: 'Consultancy',
-        11: 'Data Analytics',
-        12: 'Data Mining and Big Data',
-        13: 'Data Visualisation',
-        14: 'Databases',
-        15: 'Development',
-        16: 'Game Development',
-        17: 'Graphics',
-        18: 'Health Informatics',
-        19: 'Information and Data Governanace',
-        20: 'IoT Scoping',
-        21: 'Statistical Modeling and Anlaysis by ML',
-        22: 'Networking Security',
-        23: 'Networking Services',
-        24: 'Project Management',
-        25: 'Robotics',
-        26: 'Telecommunication',
-        27: 'Testing/QA',
-        28: 'UI/UX'
+        1: 'Accounting',
+        2: 'AI/Machine Learning',
+        3: 'Architercture Policy and Planning',
+        4: 'Automation of Processes',
+        5: 'Business Analytics',
+        6: 'Blockchain',
+        7: 'CCTV Analytics Build',
+        8: 'Chatbots',
+        9: 'Cloud',
+        10: 'CMS',
+        11: 'Consultancy',
+        12: 'Data Analytics',
+        13: 'Data Mining and Big Data',
+        14: 'Data Visualisation',
+        15: 'Databases',
+        16: 'Development',
+        17: 'Game Development',
+        18: 'Graphics',
+        19: 'Health Informatics',
+        20: 'Human Resources',
+        21: 'Information and Data Governanace',
+        22: 'International Business',
+        23: 'IoT Scoping',
+        24: 'Statistical Modeling and Anlaysis by ML',
+        25: 'Marketing',
+        26: 'Networking Security',
+        27: 'Networking Services',
+        28: 'Project Management',
+        29: 'Robotics',
+        30: 'Telecommunication',
+        31: 'Testing/QA',
+        32: 'UI/UX'
     },
     },
     {
@@ -149,34 +163,38 @@ export default function TableList() {
       field: 'interest3',
       lookup: {
         0: 'No Preference',
-        1: 'AI/Machine Learning',
-        2: 'Architercture Policy and Planning',
-        3: 'Automation of Processes',
-        4: 'Business Analytics',
-        5: 'Blockchain',
-        6: 'CCTV Analytics Build',
-        7: 'Chatbots',
-        8: 'Cloud',
-        9: 'CMS',
-        10: 'Consultancy',
-        11: 'Data Analytics',
-        12: 'Data Mining and Big Data',
-        13: 'Data Visualisation',
-        14: 'Databases',
-        15: 'Development',
-        16: 'Game Development',
-        17: 'Graphics',
-        18: 'Health Informatics',
-        19: 'Information and Data Governanace',
-        20: 'IoT Scoping',
-        21: 'Statistical Modeling and Anlaysis by ML',
-        22: 'Networking Security',
-        23: 'Networking Services',
-        24: 'Project Management',
-        25: 'Robotics',
-        26: 'Telecommunication',
-        27: 'Testing/QA',
-        28: 'UI/UX'
+        1: 'Accounting',
+        2: 'AI/Machine Learning',
+        3: 'Architercture Policy and Planning',
+        4: 'Automation of Processes',
+        5: 'Business Analytics',
+        6: 'Blockchain',
+        7: 'CCTV Analytics Build',
+        8: 'Chatbots',
+        9: 'Cloud',
+        10: 'CMS',
+        11: 'Consultancy',
+        12: 'Data Analytics',
+        13: 'Data Mining and Big Data',
+        14: 'Data Visualisation',
+        15: 'Databases',
+        16: 'Development',
+        17: 'Game Development',
+        18: 'Graphics',
+        19: 'Health Informatics',
+        20: 'Human Resources',
+        21: 'Information and Data Governanace',
+        22: 'International Business',
+        23: 'IoT Scoping',
+        24: 'Statistical Modeling and Anlaysis by ML',
+        25: 'Marketing',
+        26: 'Networking Security',
+        27: 'Networking Services',
+        28: 'Project Management',
+        29: 'Robotics',
+        30: 'Telecommunication',
+        31: 'Testing/QA',
+        32: 'UI/UX'
     },
     },
     { title: 'Note', field: 'note'},
@@ -284,9 +302,9 @@ export default function TableList() {
     console.log(restArr)
     for (let i = 0; i < restArr.length; i++) {
       if (ndata.studentName === restArr[i].studentName) {
-        setAllowToUp(prevValue => prevValue + 1);
+        allowToUp += 1;
       }
-      console.log("allup: ", allowToUp)
+      //console.log("allup: ", allowToUp)
     }
     if (!ifNew) {
       alert("Fail to update, target student doesn't exist.")
@@ -302,19 +320,20 @@ export default function TableList() {
     if (allowToUp >= 1) {
       console.log(allowToUp)
       alert("Fail to update, only one student should exist.")
-      setAllowToUp(0)
+      //setAllowToUp(0)
 
     }
   }
   dispatch(loadStu(auth.email))
-  setAllowToUp(0)
+  //setAllowToUp(0)
   }
 
-  const addStuViaExcel = () => {
+  const addStuViaExcel = async () => {
     //TODO: This function should add student info row by row instead of import the whole list. 1st: check if there are already one with the same student name. 2nd: if yes, update; if no, insert.
     //TODO: All students should be sent, students with same cname should be overwrite.
-      var originTableData = data
-      var i = 0;
+    setWaiting(true)
+    var originTableData = data
+    var i = 0;
       // Check imported data array
       for( i; i<excelData.length; i++) {
         //com to import: excelData[i]
@@ -327,13 +346,13 @@ export default function TableList() {
             // console.log("duplicated one: ",excelData[i])
             // console.log(originTableData, originTableData[k].tableData.id)
             // console.log(originTableData[originTableData[k].tableData.id]._id)
-            dispatch(deleteStu(originTableData, originTableData[k].tableData.id))
+            await dispatch(deleteStu(originTableData, originTableData[k].tableData.id))
             dispatch(delStu(originTableData[originTableData[k].tableData.id]._id))
           }
         }
-          dispatch(addStu(excelData[i], auth.email))
-          dispatch(saveExcelStu(auth.email))
-          setData([...data, excelData[i]]);
+          await dispatch(addStu(excelData[i], auth.email))
+          await dispatch(saveExcelStu(auth.email))
+          //setData([...data, excelData[i]]);
       }
     //console.log("data: ",data)
     alert("Excel data imported.")
@@ -356,14 +375,28 @@ export default function TableList() {
     window.location.reload()
   }
 
-  //test
-  function handleClick() {
+  function downLoadTable() {
     var date = new Date()
     var dateStr = date.toLocaleDateString()
     var downLoadWB = XLSX.utils.book_new()
     var downLoadWS = XLSX.utils.json_to_sheet(data)
     XLSX.utils.book_append_sheet(downLoadWB, downLoadWS)
     XLSX.writeFile(downLoadWB, dateStr+"_StudentInfo.xlsx")
+  }
+
+  function handleClick() {
+    downLoadTable()
+  }
+
+  async function handleDelAll() {
+    setWaiting(true)
+    downLoadTable()
+    await dispatch(deleteAllStu(data, auth.email))
+    window.location.reload()
+  }
+
+  const handleDelClose = () => {
+    setDelOpen(false)
   }
 
   const fetchStu = async () => {
@@ -441,6 +474,11 @@ export default function TableList() {
                 onClick={handleClick}>
           Download Table
         </Button>
+        <Button 
+                color="danger"
+                onClick={()=>setDelOpen(true)}>
+          Delete All
+        </Button>
 
           <Dialog
           open={open}
@@ -453,16 +491,40 @@ export default function TableList() {
             {excelData != null ?
             <DialogContentText id="alert-dialog-description">
               Are you sure to upload {excelData.length} rows of data? (Companies with same name will be overwrited)
+              {waiting?<LinearProgress />:<></>}
             </DialogContentText>
             :
             <></>
             }
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="primary">
+            <Button onClick={handleClose} disabled={waiting} color="primary">
               No
             </Button>
-            <Button color="primary" onClick={addStuViaExcel} autoFocus>
+            <Button color="primary" onClick={addStuViaExcel} disabled={waiting} autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+                {/* Delete all dialog */}
+                <Dialog
+          open={delOpen}
+          onClose={handleDelClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Data from Excel Detected!"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to DELETE ALL? If so, all data will be downloaded as the backup, and then removed.
+              {waiting?<LinearProgress />:<></>}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelClose} disabled={waiting} color="primary">
+              No
+            </Button>
+            <Button color="primary" onClick={handleDelAll} disabled={waiting} autoFocus>
               Yes
             </Button>
           </DialogActions>

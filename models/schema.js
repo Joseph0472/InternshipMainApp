@@ -86,4 +86,4 @@ const historySchema = new mongoose.Schema({
 
 })
 
-export const Forecast = mongoose.model('HistoricalData', historySchema)
+export const HisData = mongoose.model('HisData', historySchema)

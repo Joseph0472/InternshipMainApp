@@ -23,7 +23,7 @@ export default function Footer(props) {
               target="_blank"
               className={classes.a}
             >
-              Group 7
+              Group 7&nbsp;&nbsp;
             </a>
             Internship Forecasting Project
           </span>

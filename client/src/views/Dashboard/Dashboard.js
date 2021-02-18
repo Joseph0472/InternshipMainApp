@@ -15,9 +15,11 @@ import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import Sync from "@material-ui/icons/Sync";
 import AccessTime from "@material-ui/icons/AccessTime";
 import Accessibility from "@material-ui/icons/Accessibility";
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import BugReport from "@material-ui/icons/BugReport";
 import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
+import SchoolIcon from '@material-ui/icons/School';
 // core components
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -36,9 +38,11 @@ import { useState, useEffect } from 'react';
 import GoogleLogin from 'react-google-login';
 import GoogleLogout from 'react-google-login';
 import Chart from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Pie } from 'react-chartjs-2';
 import { loadCom } from '../../redux/reducers/companyReducer'
 import { loadStu } from '../../redux/reducers/studentReducer'
+import { getAllHisData} from '../../api/historicalData'
+
 
 
 
@@ -60,6 +64,40 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth)
   const state = useSelector((state) => state)
+  const [hisArr, setHisArr] = useState([])
+
+  const lookup = {
+    0: 'No Preference',
+    1: 'AI/Machine Learning',
+    2: 'Architercture Policy and Planning',
+    3: 'Automation of Processes',
+    4: 'Business Analytics',
+    5: 'Blockchain',
+    6: 'CCTV Analytics Build',
+    7: 'Chatbots',
+    8: 'Cloud',
+    9: 'CMS',
+    10: 'Consultancy',
+    11: 'Data Analytics',
+    12: 'Data Mining and Big Data',
+    13: 'Data Visualisation',
+    14: 'Databases',
+    15: 'Development',
+    16: 'Game Development',
+    17: 'Graphics',
+    18: 'Health Informatics',
+    19: 'Information and Data Governanace',
+    20: 'IoT Scoping',
+    21: 'Statistical Modeling and Anlaysis by ML',
+    22: 'Networking Security',
+    23: 'Networking Services',
+    24: 'Project Management',
+    25: 'Robotics',
+    26: 'Telecommunication',
+    27: 'Testing/QA',
+    28: 'UI/UX'
+}
+
 
   var companyNum = state.company.length;
   var activeCompNum = 0;
@@ -100,44 +138,7 @@ export default function Dashboard() {
 
   var emRate = (employeedStuNum/activeStuNum).toFixed(2)*100;
 
-  const pData = {
-    labels: [
-      'BA',
-      'Test',
-      'Dev'
-    ],
-    datasets: [{
-      data: [300, 50, 100],
-      backgroundColor: [
-      '#FF6384',
-      '#36A2EB',
-      '#FFCE56'
-      ],
-      hoverBackgroundColor: [
-      '#FF6384',
-      '#36A2EB',
-      '#FFCE56'
-      ]
-    }]
-  };
-
-  const pieData = {
-    series:[
-      {
-        value:20,
-        name:"S1"
-      },
-      {
-        value:20,
-        name:"S1"
-      },
-      {
-        value:60,
-        name:"S1"
-      }
-    ]
-  }
-
+  Chart.defaults.global.defaultFontColor = "#fff";
   const fetchInfo = async () => {
     const company = await dispatch(loadCom(auth.email))
     const student = await dispatch(loadStu(auth.email))
@@ -146,9 +147,99 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-      fetchInfo() 
+      fetchInfo()
+      const hisdataP = new Promise((resolve, reject)=>{
+        resolve(getAllHisData(auth.email))
+      }).then((result)=>{
+        console.log(result)
+        setHisArr(result)
+      })
   },[])
-  
+
+  console.log(hisArr)
+// Conversion Rate
+  var comArr = []
+  var cRate = []
+  var cNum = []
+  var labels = hisArr.map((obj)=>{
+    comArr.push(obj.period.substring(0,4))
+    cRate.push((obj.stuNum/obj.comNum).toFixed(2)*100)
+    cNum.push(obj.comNum)
+  }
+  )
+  console.log(cRate)
+
+  const conversionRateData = {
+    labels: comArr,
+    series: [cRate]
+  }
+
+// Companies Reached out
+const comReachedOutData = {
+  labels: comArr,
+  series: [cNum]
+}
+
+//preference
+var activeStuArr = []
+state.student.forEach(student => {
+  if (student.stuState !== 0 && student.stuState !== 3) {
+    activeStuArr.push(student)
+  }
+});
+var countArr = new Array(33).fill(0);
+activeStuArr.forEach(student => {
+  countArr[student.interest1]++
+  countArr[student.interest2]++
+});
+var sortedArr = [...countArr].sort().reverse();
+console.log(sortedArr)
+console.log(countArr)
+var fstPopInt = countArr.indexOf(sortedArr[0])
+// var scdPopIndex = sortedArr[1]
+// var thdPopIndex = sortedArr[2]
+// for(let i=1; i<sortedArr.length; i++) {
+//   if(sortedArr[i] === sortedArr[0]) {
+//     scdPopIndex = i
+//     break;
+//   }
+// }
+// for(let j=scdPopIndex; j<sortedArr.length; j++) {
+//   if(sortedArr[j] === sortedArr[scdPopIndex]) {
+//     thdPopIndex = j
+//     break;
+//   }
+// }
+var secPopInt
+var thdPopInt
+if (sortedArr[0] === sortedArr[1]) {
+  secPopInt = countArr.indexOf(sortedArr[1],countArr.indexOf(sortedArr[0])+1)
+  if (sortedArr[1] === sortedArr[2]) {
+    thdPopInt = countArr.indexOf(sortedArr[2],countArr.indexOf(sortedArr[1])+2)
+  }
+}
+console.log(fstPopInt, secPopInt, thdPopInt)
+
+const pData = {
+  labels: [
+lookup[fstPopInt], lookup[secPopInt], lookup[thdPopInt]
+  ],
+  datasets: [{
+    data: [countArr[fstPopInt], countArr[secPopInt], countArr[thdPopInt]],
+    backgroundColor: [
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56'
+    ],
+    hoverBackgroundColor: [
+    '#FF6384',
+    '#36A2EB',
+    '#FFCE56'
+    ]
+  }]
+};
+
+
   return (
     <div>
       <GridContainer>
@@ -158,7 +249,7 @@ export default function Dashboard() {
               <CardIcon color="warning">
                 <Icon>corporate_fare</Icon>
               </CardIcon>
-              <p className={classes.cardCategory}>Active Company</p>
+              <p className={classes.cardCategory}>Active Companies</p>
               <h3 className={classes.cardTitle}>{activeCompNum}/{companyNum}</h3>
             </CardHeader>
             <CardFooter stats>
@@ -180,9 +271,9 @@ export default function Dashboard() {
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="success" stats icon>
-              <CardIcon color="success">
-                <Icon>group</Icon>
+            <CardHeader color="primary " stats icon>
+              <CardIcon color="primary">
+                <SchoolIcon />
               </CardIcon>
               <p className={classes.cardCategory}>Active Students</p>
               <h3 className={classes.cardTitle}>{activeStuNum}</h3>
@@ -190,15 +281,15 @@ export default function Dashboard() {
             <CardFooter stats>
               <div className={classes.stats}>
                 <DateRange />
-                Current number of active students
+                Current number
               </div>
             </CardFooter>
           </Card>
         </GridItem>
         <GridItem xs={12} sm={6} md={3}>
           <Card>
-            <CardHeader color="info" stats icon>
-              <CardIcon color="info">
+            <CardHeader color="success" stats icon>
+              <CardIcon color="success">
                 <Icon>send</Icon>
               </CardIcon>
               <p className={classes.cardCategory}>Employment rate</p>
@@ -207,7 +298,7 @@ export default function Dashboard() {
             <CardFooter stats>
             <div className={classes.stats}>
                 <Sync />
-                Percentage of employed students
+                Percentage of students got internship
               </div>
             </CardFooter>
           </Card>
@@ -216,27 +307,28 @@ export default function Dashboard() {
         <Card>
             <CardHeader color="info" stats icon>
               <CardIcon color="info">
-                <Icon>send</Icon>
+                <PeopleAltIcon />
               </CardIcon>
-              <p className={classes.cardCategory}>Employment rate</p>
-              <h3 className={classes.cardTitle}>{emRate}%</h3>
+              <p className={classes.cardCategory}>Companies per student</p>
+              <h3 className={classes.cardTitle}>{(activeCompNum/activeStuNum).toFixed(2)}</h3>
             </CardHeader>
             <CardFooter stats>
             <div className={classes.stats}>
                 <Sync />
-                Percentage of employed students
+                Average status
               </div>
             </CardFooter>
           </Card>
         </GridItem>
       </GridContainer>
+      {/* companies info */}
       <GridContainer>
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
             <CardHeader color="success">
               <ChartistGraph
                 className="ct-chart"
-                data={dailySalesChart.data}
+                data={conversionRateData}
                 type="Line"
                 options={dailySalesChart.options}
                 listener={dailySalesChart.animation}
@@ -249,7 +341,7 @@ export default function Dashboard() {
             </CardBody>
             <CardFooter chart>
               <div className={classes.stats}>
-                <AccessTime /> Updated 4 Minutes ago
+                <AccessTime /> The percentage of companies on board out of total
               </div>
             </CardFooter>
           </Card>
@@ -259,7 +351,7 @@ export default function Dashboard() {
             <CardHeader color="warning">
               <ChartistGraph
                 className="ct-chart"
-                data={emailsSubscriptionChart.data}
+                data={comReachedOutData}
                 type="Bar"
                 options={emailsSubscriptionChart.options}
                 responsiveOptions={emailsSubscriptionChart.responsiveOptions}
@@ -271,7 +363,7 @@ export default function Dashboard() {
             </CardBody>
             <CardFooter chart>
               <div className={classes.stats}>
-                <AccessTime /> Campaign Sent 2 Days Ago
+                <AccessTime /> Based on historical data
               </div>
             </CardFooter>
           </Card>
@@ -279,19 +371,26 @@ export default function Dashboard() {
         <GridItem xs={12} sm={12} md={4}>
           <Card chart>
             <CardHeader color="success">
-            <Doughnut data={pData} />
+            <Pie data={pData} width={100} height={48} options={dailySalesChart.options} responsiveOptions={emailsSubscriptionChart.responsiveOptions}/>
             </CardHeader>
             <CardBody>
-              <h4 className={classes.cardTitle}>Pie</h4>
+              <h4 className={classes.cardTitle}>Top 3 Companies' Interests</h4>
             </CardBody>
             <CardFooter chart>
               <div className={classes.stats}>
-                <AccessTime /> Campaign Sent 2 Days Ago
+                <AccessTime /> Based on current data 
               </div>
             </CardFooter>
           </Card>
         </GridItem>
       </GridContainer>
+      <GridItem xs={12} sm={12} md={12}>
+          <Card>
+            <CardBody>
+              <img style={{height: "100%", width:"100%"}} src="https://storage-prtl-co.imgix.net/endor/organisations/9951/covers/1556122497_24111312_uoacoverimage.jpg?w=1920&h=550&fit=crop&auto=format,compress&q=40" />
+            </CardBody>
+          </Card>
+        </GridItem>
     </div>
   );
 }

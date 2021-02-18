@@ -19,10 +19,12 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import XLSX from 'xlsx'
 import { addCom, deleteCom, updateCom, addComViaExcelFile } from '../../redux/actions/companyActions'
-import { saveCom, loadCom, delCom, upCom, saveExcelCom } from '../../redux/reducers/companyReducer'
+import { saveCom, loadCom, delCom, upCom, saveExcelCom, deleteAllCom } from '../../redux/reducers/companyReducer'
 import json2xls from 'json2xls'
 import exportFromJSON from 'export-from-json'
 import { object } from "prop-types";
+import LinearProgress from '@material-ui/core/LinearProgress';
+
 
 
 const styles = {
@@ -78,34 +80,38 @@ export default function CompanyList() {
       field: 'interest1',
       lookup: {
         0: 'No Preference',
-        1: 'AI/Machine Learning',
-        2: 'Architercture Policy and Planning',
-        3: 'Automation of Processes',
-        4: 'Business Analytics',
-        5: 'Blockchain',
-        6: 'CCTV Analytics Build',
-        7: 'Chatbots',
-        8: 'Cloud',
-        9: 'CMS',
-        10: 'Consultancy',
-        11: 'Data Analytics',
-        12: 'Data Mining and Big Data',
-        13: 'Data Visualisation',
-        14: 'Databases',
-        15: 'Development',
-        16: 'Game Development',
-        17: 'Graphics',
-        18: 'Health Informatics',
-        19: 'Information and Data Governanace',
-        20: 'IoT Scoping',
-        21: 'Statistical Modeling and Anlaysis by ML',
-        22: 'Networking Security',
-        23: 'Networking Services',
-        24: 'Project Management',
-        25: 'Robotics',
-        26: 'Telecommunication',
-        27: 'Testing/QA',
-        28: 'UI/UX'
+        1: 'Accounting',
+        2: 'AI/Machine Learning',
+        3: 'Architercture Policy and Planning',
+        4: 'Automation of Processes',
+        5: 'Business Analytics',
+        6: 'Blockchain',
+        7: 'CCTV Analytics Build',
+        8: 'Chatbots',
+        9: 'Cloud',
+        10: 'CMS',
+        11: 'Consultancy',
+        12: 'Data Analytics',
+        13: 'Data Mining and Big Data',
+        14: 'Data Visualisation',
+        15: 'Databases',
+        16: 'Development',
+        17: 'Game Development',
+        18: 'Graphics',
+        19: 'Health Informatics',
+        20: 'Human Resources',
+        21: 'Information and Data Governanace',
+        22: 'International Business',
+        23: 'IoT Scoping',
+        24: 'Statistical Modeling and Anlaysis by ML',
+        25: 'Marketing',
+        26: 'Networking Security',
+        27: 'Networking Services',
+        28: 'Project Management',
+        29: 'Robotics',
+        30: 'Telecommunication',
+        31: 'Testing/QA',
+        32: 'UI/UX'
     },
     },
     {
@@ -113,34 +119,38 @@ export default function CompanyList() {
       field: 'interest2',
       lookup: {
         0: 'No Preference',
-        1: 'AI/Machine Learning',
-        2: 'Architercture Policy and Planning',
-        3: 'Automation of Processes',
-        4: 'Business Analytics',
-        5: 'Blockchain',
-        6: 'CCTV Analytics Build',
-        7: 'Chatbots',
-        8: 'Cloud',
-        9: 'CMS',
-        10: 'Consultancy',
-        11: 'Data Analytics',
-        12: 'Data Mining and Big Data',
-        13: 'Data Visualisation',
-        14: 'Databases',
-        15: 'Development',
-        16: 'Game Development',
-        17: 'Graphics',
-        18: 'Health Informatics',
-        19: 'Information and Data Governanace',
-        20: 'IoT Scoping',
-        21: 'Statistical Modeling and Anlaysis by ML',
-        22: 'Networking Security',
-        23: 'Networking Services',
-        24: 'Project Management',
-        25: 'Robotics',
-        26: 'Telecommunication',
-        27: 'Testing/QA',
-        28: 'UI/UX'
+        1: 'Accounting',
+        2: 'AI/Machine Learning',
+        3: 'Architercture Policy and Planning',
+        4: 'Automation of Processes',
+        5: 'Business Analytics',
+        6: 'Blockchain',
+        7: 'CCTV Analytics Build',
+        8: 'Chatbots',
+        9: 'Cloud',
+        10: 'CMS',
+        11: 'Consultancy',
+        12: 'Data Analytics',
+        13: 'Data Mining and Big Data',
+        14: 'Data Visualisation',
+        15: 'Databases',
+        16: 'Development',
+        17: 'Game Development',
+        18: 'Graphics',
+        19: 'Health Informatics',
+        20: 'Human Resources',
+        21: 'Information and Data Governanace',
+        22: 'International Business',
+        23: 'IoT Scoping',
+        24: 'Statistical Modeling and Anlaysis by ML',
+        25: 'Marketing',
+        26: 'Networking Security',
+        27: 'Networking Services',
+        28: 'Project Management',
+        29: 'Robotics',
+        30: 'Telecommunication',
+        31: 'Testing/QA',
+        32: 'UI/UX'
     },
     },
     {
@@ -148,34 +158,38 @@ export default function CompanyList() {
       field: 'interest3',
       lookup: {
         0: 'No Preference',
-        1: 'AI/Machine Learning',
-        2: 'Architercture Policy and Planning',
-        3: 'Automation of Processes',
-        4: 'Business Analytics',
-        5: 'Blockchain',
-        6: 'CCTV Analytics Build',
-        7: 'Chatbots',
-        8: 'Cloud',
-        9: 'CMS',
-        10: 'Consultancy',
-        11: 'Data Analytics',
-        12: 'Data Mining and Big Data',
-        13: 'Data Visualisation',
-        14: 'Databases',
-        15: 'Development',
-        16: 'Game Development',
-        17: 'Graphics',
-        18: 'Health Informatics',
-        19: 'Information and Data Governanace',
-        20: 'IoT Scoping',
-        21: 'Statistical Modeling and Anlaysis by ML',
-        22: 'Networking Security',
-        23: 'Networking Services',
-        24: 'Project Management',
-        25: 'Robotics',
-        26: 'Telecommunication',
-        27: 'Testing/QA',
-        28: 'UI/UX'
+        1: 'Accounting',
+        2: 'AI/Machine Learning',
+        3: 'Architercture Policy and Planning',
+        4: 'Automation of Processes',
+        5: 'Business Analytics',
+        6: 'Blockchain',
+        7: 'CCTV Analytics Build',
+        8: 'Chatbots',
+        9: 'Cloud',
+        10: 'CMS',
+        11: 'Consultancy',
+        12: 'Data Analytics',
+        13: 'Data Mining and Big Data',
+        14: 'Data Visualisation',
+        15: 'Databases',
+        16: 'Development',
+        17: 'Game Development',
+        18: 'Graphics',
+        19: 'Health Informatics',
+        20: 'Human Resources',
+        21: 'Information and Data Governanace',
+        22: 'International Business',
+        23: 'IoT Scoping',
+        24: 'Statistical Modeling and Anlaysis by ML',
+        25: 'Marketing',
+        26: 'Networking Security',
+        27: 'Networking Services',
+        28: 'Project Management',
+        29: 'Robotics',
+        30: 'Telecommunication',
+        31: 'Testing/QA',
+        32: 'UI/UX'
     },
     },
   ]);
@@ -183,6 +197,10 @@ export default function CompanyList() {
   var [data, setData] = useState(state);
 
   const [open, setOpen] = React.useState(false);
+
+  const [delOpen, setDelOpen] = useState(false);
+
+  const [waiting, setWaiting] = useState(false)
 
 
   const readExcel = (file) => {
@@ -379,9 +397,10 @@ export default function CompanyList() {
   dispatch(loadCom(auth.email))
   }
 
-  const addComViaExcel = () => {
+  const addComViaExcel = async () => {
     //TODO: This function should add company info row by row instead of import the whole list. 1st: check if there are already one with the same company name. 2nd: if yes, update; if no, insert.
     //TODO: All companies should be sent, companies with same cname should be overwrite.
+    setWaiting(true)
       var originTableData = data
       var i = 0;
       // Check imported data array
@@ -396,13 +415,13 @@ export default function CompanyList() {
             // console.log("duplicated one: ",excelData[i])
             // console.log(originTableData, originTableData[k].tableData.id)
             // console.log(originTableData[originTableData[k].tableData.id]._id)
-            dispatch(deleteCom(originTableData, originTableData[k].tableData.id))
+            await dispatch(deleteCom(originTableData, originTableData[k].tableData.id))
             dispatch(delCom(originTableData[originTableData[k].tableData.id]._id))
           }
         }
-          dispatch(addCom(excelData[i], auth.email))
-          dispatch(saveExcelCom(auth.email))
-          setData([...data, excelData[i]]);
+          await dispatch(addCom(excelData[i], auth.email))
+          await dispatch(saveExcelCom(auth.email))
+          //setData([...data, excelData[i]]);
       }
     //console.log("data: ",data)
     alert("Excel data imported.")
@@ -425,13 +444,28 @@ export default function CompanyList() {
     window.location.reload()
   }
 
-  function handleClick() {
+  function downLoadTable () {
     var date = new Date()
     var dateStr = date.toLocaleDateString()
     var downLoadWB = XLSX.utils.book_new()
     var downLoadWS = XLSX.utils.json_to_sheet(data)
     XLSX.utils.book_append_sheet(downLoadWB, downLoadWS)
     XLSX.writeFile(downLoadWB, dateStr+"_CompanyInfo.xlsx")
+  }
+
+  function handleClick() {
+    downLoadTable()
+  }
+
+  async function handleDelAll() {
+    setWaiting(true)
+    downLoadTable()
+    await dispatch(deleteAllCom(data, auth.email))
+    window.location.reload()
+  }
+
+  const handleDelClose = () => {
+    setDelOpen(false)
   }
 
   const fetchCom = async () => {
@@ -525,8 +559,13 @@ export default function CompanyList() {
           hidden
         />
         </Button>
+        <Button 
+                color="danger"
+                onClick={()=>setDelOpen(true)}>
+          Delete All
+        </Button>
 
-
+{/* Excel upload dialog */}
           <Dialog
           open={open}
           onClose={handleClose}
@@ -538,16 +577,41 @@ export default function CompanyList() {
             {excelData != null ?
             <DialogContentText id="alert-dialog-description">
               Are you sure to upload {excelData.length} rows of data? (Companies with same name will be overwrited)
+              {waiting?<LinearProgress />:<></>}
             </DialogContentText>
             :
             <></>
             }
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="primary">
+            <Button onClick={handleClose} disabled={waiting} color="primary">
               No
             </Button>
-            <Button color="primary" onClick={addComViaExcel} autoFocus>
+            <Button color="primary" onClick={addComViaExcel} disabled={waiting} autoFocus>
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Delete all dialog */}
+        <Dialog
+          open={delOpen}
+          onClose={handleDelClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Data from Excel Detected!"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Are you sure you want to DELETE ALL? If so, all data will be downloaded as the backup, and then removed.
+              {waiting?<LinearProgress />:<></>}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDelClose} disabled={waiting} color="primary">
+              No
+            </Button>
+            <Button color="primary" onClick={handleDelAll} disabled={waiting} autoFocus>
               Yes
             </Button>
           </DialogActions>

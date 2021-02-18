@@ -37,7 +37,7 @@ import Maps from "views/Maps/Maps.js";
 import NotificationsPage from "views/Notifications/Notifications.js";
 // core components/views for RTL layout
 import RTLPage from "views/RTLPage/RTLPage.js";
-import Upload from "views/Upload/Upload.js";
+import Doc from "views/Doc/Doc.js";
 import SignIn from "views/SignIn/Signin.js";
 
 const dashboardRoutes = [
@@ -97,14 +97,14 @@ const dashboardRoutes = [
   //   component: NotificationsPage,
   //   layout: "/admin"
   // },
-  // {
-  //   path: "/upload",
-  //   name: "Upload from Trello",
-  //   rtlName: "إخطارات",
-  //   icon: Notifications,
-  //   component: Upload,
-  //   layout: "/admin"
-  // }
+  {
+    path: "/doc",
+    name: "Documentation",
+    rtlName: "إخطارات",
+    icon: Notifications,
+    component: Doc,
+    layout: "/admin"
+  }
 ];
 
 export default dashboardRoutes;

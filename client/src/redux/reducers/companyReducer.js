@@ -24,7 +24,6 @@ const companyReducer = (state = [], action) => {
 
     switch(type) {
         case CREATE_COMPANY:
-        // console.log(state) ////state is a array of company object
             return [...state, {
                 userEmail: payload.userEmail,
                 companyName: payload.companyName,
@@ -59,10 +58,7 @@ const companyReducer = (state = [], action) => {
             }
             return [...dataUpdate];
         case ADD_COM_VIA_EXCEL:
-            console.log("pl data: ", payload.filedata)
-            console.log("state: ", state)
             //console.log(state.push.apply(state,payload.filedata))
-
             return state.push.apply(state,payload.filedata);
         case SET_COMPANIES:
             // console.log("set company state:", state) //list of companies in db
@@ -98,8 +94,6 @@ export const saveExcelCom = (userEmail) => async (dispatch, getState) => {
     const index = companies.length - 1
     var comToSave = companies[index]
     comToSave.userEmail = userEmail
-
-    //console.log(companies)
     //TODO: Companies with same name should be not allowed to add
     await fetch(config.serverUrl+"/api/company/", {
         method: "POST",
@@ -141,3 +135,16 @@ export const upCom = (nrow) => async (dispatch, getState) => {
     }).then(alert("Company updated."))
 }
 
+export const deleteAllCom = (data, email) => async (dispatch, getState) => {
+    // data.forEach(com => {
+    //      fetch(config.serverUrl+"/api/company/"+com._id, {
+    //         method: "DELETE"
+    //     })
+    // });
+
+  await Promise.all(data.map(async (com) => {
+    await fetch(config.serverUrl+"/api/company/"+com._id, {
+        method: "DELETE"
+    })
+  }));
+}

@@ -38,6 +38,7 @@ import regression from "regression"
 import Skeleton from 'react-loading-skeleton';
 import { loadCom } from '../../redux/reducers/companyReducer' 
 import { loadStu } from '../../redux/reducers/studentReducer'
+import { getAllHisData, addHisData, deleteHisData } from '../../api/historicalData'
 
 const styles = {
   typo: {
@@ -140,6 +141,7 @@ export default function ForecastingPage() {
   const state = useSelector((state) => state)
   // console.log(state) //{company: Array(52), student: Array(24)}
   const [data, setData] = useState(0)
+  const [loaded, setLoaded] = useState(false)
 
   const [foreData, setForeData] = useState({
     totalComNum: 0, 
@@ -160,8 +162,16 @@ export default function ForecastingPage() {
     comForFst: 0,
     comForSec: 0,
     comForThd: 0,
-
   })
+
+  const [historicalData, setHistoricalData] = useState({
+    userEmail: "",
+    period: "",
+    stuNum: 0,
+    comNum: 0,
+  })
+
+  const [hisArr, setHisArr] = useState([])
 
   const [loading, setLoading] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
@@ -217,13 +227,17 @@ export default function ForecastingPage() {
     return { period, stuNum, comNum};
   }
   
-  const historicalInfoRows = [
-    createHisData('2018 Semester2', 30, 166),
-    createHisData('2018 Summer Semester', 27, 171),
-    createHisData('2019 Semester1', 30,110),
-    createHisData('2019 Semester2', 25,132),
-    createHisData('2019 Summer Semester', 36, 327),
-  ];
+  // const historicalInfoRows = [
+  //   createHisData('2018 Semester2', 30, 166),
+  //   createHisData('2018 Summer Semester', 27, 171),
+  //   createHisData('2019 Semester1', 30,110),
+  //   createHisData('2019 Semester2', 25,132),
+  //   createHisData('2019 Summer Semester', 36, 327),
+  // ];
+
+  const historicalInfoRows = hisArr.map(obj => 
+    createHisData(obj.period, obj.stuNum, obj.comNum)
+  )
 
   function createResultData(category, value) {
     return { category, value };
@@ -231,37 +245,72 @@ export default function ForecastingPage() {
 
 
   //TODO: Make it dynamic
-  const hisData = [[30,166], [27,171], [30,110], [25,132], [36, 327]]
+  //const hisData = [[30,166], [27,171], [30,110], [25,132], [36, 327]]
+
 
   function handleForecast(){
-    console.log(foreData)
+    var hisData = []
+    const load = hisArr.map((obj) =>{ 
+      //console.log([obj.stuNum, obj.comNum])
+      hisData.push([obj.stuNum, obj.comNum])
+    }
+      )
+    console.log(hisData)
     const result = regression.linear(hisData);
     const gradient = result.equation[0];
     const yIntercept = result.equation[1];
-    console.log("forcasting gradient: ",gradient )
+    console.log("forcasting gradient: ",gradient)
     console.log("forcasting yIntercept: ",yIntercept)
     // M O D E L
-    const predictedTotalCom = Math.ceil(gradient*foreData.totalStuNum + (5-inPara)*0.2*foreData.totalStuNum + (5-exPara)*0.2*foreData.totalStuNum + yIntercept) 
+    const linearForeResult = Math.ceil(gradient*foreData.stuSeekingForInterNum + yIntercept)
+    const predictedTotalCom = linearForeResult > foreData.stuSeekingForInterNum/0.25 ? Math.ceil(gradient*foreData.stuSeekingForInterNum + (5-inPara)*0.2*foreData.totalStuNum + (5-exPara)*0.2*foreData.totalStuNum + yIntercept) : Math.ceil(foreData.stuSeekingForInterNum/0.18)
     const interestedComNum = Math.ceil(predictedTotalCom*0.14)
     const onBoardcomNum = Math.ceil(interestedComNum*0.81)
     // use a counter array to count the companies required.
-    var countArr = new Array(29).fill(0);
     var activeStuArr = []
     state.student.forEach(student => {
       if (student.stuState !== 0 && student.stuState !== 3) {
         activeStuArr.push(student)
       }
     });
-    console.log(activeStuArr)
+    // preference
+    var countArr = new Array(33).fill(0);
     activeStuArr.forEach(student => {
       countArr[student.interest1]++
+      countArr[student.interest2]++
     });
     var sortedArr = [...countArr].sort().reverse();
+    console.log(sortedArr)
+    console.log(countArr)
     var fstPopInt = countArr.indexOf(sortedArr[0])
-    var secPopInt = countArr.indexOf(sortedArr[1])
-    var thdPopInt = countArr.indexOf(sortedArr[2])
-  
-    var activeStuNum = foreData.stuSeekingForInterNum + foreData.stuWaitingForResNum
+    // var scdPopIndex = sortedArr[1]
+    // var thdPopIndex = sortedArr[2]
+    // for(let i=1; i<sortedArr.length; i++) {
+    //   if(sortedArr[i] === sortedArr[0]) {
+    //     scdPopIndex = i
+    //     break;
+    //   }
+    // }
+    // for(let j=scdPopIndex; j<sortedArr.length; j++) {
+    //   if(sortedArr[j] === sortedArr[scdPopIndex]) {
+    //     thdPopIndex = j
+    //     break;
+    //   }
+    // }
+
+    var secPopInt
+    var thdPopInt
+    if (sortedArr[0] === sortedArr[1]) {
+      secPopInt = countArr.indexOf(sortedArr[1],countArr.indexOf(sortedArr[0])+1)
+      if (sortedArr[1] === sortedArr[2]) {
+        thdPopInt = countArr.indexOf(sortedArr[2],countArr.indexOf(sortedArr[1])+2)
+      }
+    }
+    console.log(fstPopInt, secPopInt, thdPopInt)
+
+
+
+    var activeStuNum = foreData.stuSeekingForInterNum
 
     var comForFNum = Math.ceil(sortedArr[0]/activeStuNum * predictedTotalCom)
     //console.log(lookup[fstPopInt]) worked
@@ -271,11 +320,10 @@ export default function ForecastingPage() {
     var comForTNum = Math.ceil(sortedArr[2]/activeStuNum * predictedTotalCom)
     
     setForeRes({...foreRes, totalComNeed: predictedTotalCom, interestedCom: interestedComNum, onBoardCom: onBoardcomNum, fstPopularInt: fstPopInt, secPopularInt: secPopInt, thdPopularInt: thdPopInt, comForFst: comForFNum,comForSec: comForSNum, comForThd: comForTNum})
-    console.log(foreRes)
+
 
     if (predictedTotalCom < 0) {
-      alert("Fail: Can't proceed the forecasting, please get more active companies.")
-      window.location.reload()
+      setForeRes({...foreRes, totalComNeed: foreData.activeStuNum})
     }
     setReadyToShow(false)
     setLoading(true)
@@ -288,8 +336,8 @@ export default function ForecastingPage() {
 
   const resultRows = [
     createResultData("Total number of companies need to be reached out", foreRes.totalComNeed),
-    createResultData("Number of companies would be interested at next stage", foreRes.interestedCom),
-    createResultData("Number of companies would be on board", foreRes.onBoardCom),
+    createResultData("Number of companies would be interested at next stage", foreRes.interestedCom+" ~ "+Math.ceil(foreRes.interestedCom/0.65)),
+    createResultData("Number of companies would be on board", foreRes.onBoardCom+" ~ "+Math.ceil(foreRes.onBoardCom/0.65)),
     createResultData("Companies with these interests are mainly required", lookup[foreRes.fstPopularInt]+", "+lookup[foreRes.secPopularInt]+", "+lookup[foreRes.thdPopularInt]),
     createResultData("Companies interested in "+lookup[foreRes.fstPopularInt]+" need to be reach out", foreRes.comForFst),
     createResultData("Companies interested in "+lookup[foreRes.secPopularInt]+" need to be reach out", foreRes.comForSec),
@@ -299,44 +347,60 @@ export default function ForecastingPage() {
 
   
   const fetchInfo = async () => {
-    const company = await dispatch(loadCom(auth.email))
-    const student = await dispatch(loadStu(auth.email))
-    state.company = company
-    state.student = student
+    state.company = await dispatch(loadCom(auth.email))
+    state.student = await dispatch(loadStu(auth.email))
   }
   
-  useEffect(() => {
-      fetchInfo()
+  function loadDataToTable() {
     // Load Data
-       var totalCom = state.company.length
-       var activeCom = 0;
-       state.company.forEach(company => {
-         if(company.ifActive) {
-           activeCom++;
-         }
-       });
-       var totalStu = state.student.length
-       //0: 'Not active', 1: 'Seeking for Interviews', 2: 'Waiting for Response', 3: 'Got the Internship'
-       var stuSeekingForInter = 0;
-       state.student.forEach(student => {
-         if(student.stuState === 1) {
-           stuSeekingForInter++;
-         }
-       });
-       var stuWaitingForRes = 0;
-       state.student.forEach(student => {
-         if(student.stuState === 2) {
-           stuWaitingForRes++;
-         }
-       });
-       var stuGotTheInter = 0;
-       state.student.forEach(student => {
-         if(student.stuState === 3) {
-           stuGotTheInter++;
-         }
-       });
-       setForeData({...foreData, totalComNum: totalCom, activeComNum: activeCom, totalStuNum: totalStu, stuSeekingForInterNum: stuSeekingForInter, stuWaitingForResNum: stuWaitingForRes, stuGotTheInterNum: stuGotTheInter})
-  },[])
+    var totalCom = state.company.length
+    var activeCom = 0;
+    state.company.forEach(company => {
+      if(company.ifActive) {
+        activeCom++;
+      }
+    });
+    var totalStu = state.student.length
+    //0: 'Not active', 1: 'Seeking for Interviews', 2: 'Waiting for Response', 3: 'Got the Internship'
+    var stuSeekingForInter = 0;
+    state.student.forEach(student => {
+      if(student.stuState === 1) {
+        stuSeekingForInter++;
+      }
+    });
+    var stuWaitingForRes = 0;
+    state.student.forEach(student => {
+      if(student.stuState === 2) {
+        stuWaitingForRes++;
+      }
+    });
+    var stuGotTheInter = 0;
+    state.student.forEach(student => {
+      if(student.stuState === 3) {
+        stuGotTheInter++;
+      }
+    });
+    setForeData({...foreData, totalComNum: totalCom, activeComNum: activeCom, totalStuNum: totalStu, stuSeekingForInterNum: stuSeekingForInter, stuWaitingForResNum: stuWaitingForRes, stuGotTheInterNum: stuGotTheInter})
+    setLoaded(true)
+    console.log("should show data",foreData)
+  }
+  
+  var hisDataF
+  useEffect(() => {
+    async function fetch() {
+      await fetchInfo()
+      await loadDataToTable()
+      //await console.log(getAllHisData(auth.email)) 
+      setHistoricalData({...historicalData, userEmail: auth.email})
+    }
+    fetch()
+    const hisdataP = new Promise((resolve, reject)=>{
+      resolve(getAllHisData(auth.email))
+    }).then((result)=>{
+      console.log(result)
+      setHisArr(result)
+    })
+    },[])
 
   function handleInPara(e) {
     if (e.target.value < 1 || e.target.value > 10) {
@@ -353,6 +417,27 @@ export default function ForecastingPage() {
       setExPara(e.target.value)
       setErr(false)
     }
+  }
+
+  //
+  function handleArchive () {
+    addHisData(historicalData)
+  }
+  
+  function handleHisChange (e) {
+    if (e.target.id==="period") {    
+      setHistoricalData({...historicalData, period: e.target.value})
+    }
+    if (e.target.id==="stuNum") {
+      setHistoricalData({...historicalData, stuNum: e.target.value})
+    }
+    if (e.target.id==="comNum") {
+      setHistoricalData({...historicalData, comNum: e.target.value})
+    }
+  }
+
+  async function handleDelete() {
+    deleteHisData(hisArr[hisArr.length-1])
   }
 
   
@@ -421,7 +506,7 @@ export default function ForecastingPage() {
       <Grid container xs={12} sm={12} md={12} justify="center">
         <Card className={classes.foreCard}>
           <Grid item xs={12}>
-          <CardHeader>The forecasting model contains internal and external influence factors. You can forecast the workload based on the info above with default parameters' value, or modify them to have different results. NOTE: The parameters' value range is from 1 to 10, 1 stands for pessimistic and 10 stands for optimistic.</CardHeader>
+          <CardHeader>The forecasting model contains internal and external influence factors. You can forecast the workload based on the info above with default parameters' value, or modify them to have different results. NOTE: 1). The parameters' value range is from 1 to 10, 1 stands for pessimistic and 10 stands for optimistic. 2). The parameters may have no effects on the result when the student number is less then 20. 3). You could refer to StatsNZ to decide a proper external parameter.</CardHeader>
           </Grid>
               <CardBody className={classes.cardBody}>
                 <Grid container xs={12} sm={12} md={12} justify="center" alignItems="stretch">
@@ -518,25 +603,36 @@ export default function ForecastingPage() {
               </Grid>
                   <CardBody className={classes.cardBody}>
                     <Grid container xs={12} sm={12} md={12} justify="center">
-                      <Grid item xs={3}>
+                      <Grid item xs={2}>
                         <TextField className={classes.cardItem}
                         label="Period"
                         variant="filled"
+                        id="period"
+                        onChange={handleHisChange}
                         ></TextField>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs>
                         <TextField className={classes.cardItem}
                         label="Student number"
+                        type="number"
+                        id="stuNum"
+                        onChange={handleHisChange}
                         variant="filled"></TextField>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs>
                         <TextField className={classes.cardItem}
                         label="Company number"
+                        type="number"
+                        id="comNum"
+                        onChange={handleHisChange}
                         variant="filled"
                         ></TextField>
                         </Grid>
-                        <Grid item xs={3}>
-                        <Button className={classes.button}>Archive</Button>
+                        <Grid item xs>
+                        <Button className={classes.button} onClick={handleArchive}>Archive</Button>
+                        </Grid>
+                        <Grid item xs>
+                        <Button className={classes.button} onClick={handleDelete}>Delete Latest</Button>
                       </Grid>
                     </Grid>
                   </CardBody>
