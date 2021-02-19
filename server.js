@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 //Connect to DB
-mongoose.connect("mongodb+srv://pjia958:Mongo7@cluster0.wwpp1.mongodb.net/interndb?retryWrites=true&w=majority", { useNewUrlParser: true })
+mongoose.connect(process.env.MONGODB_URI || "mongodb+srv://pjia958:Mongo7@cluster0.wwpp1.mongodb.net/interndb?retryWrites=true&w=majority", { useNewUrlParser: true })
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', ()=>console.log('Connected to Database'))
