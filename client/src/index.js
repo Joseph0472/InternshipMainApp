@@ -25,6 +25,7 @@ import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import { persistStore } from 'redux-persist'
 
+
 // core components
 import Admin from "layouts/Admin.js";
 
@@ -36,6 +37,7 @@ const hist = createBrowserHistory();
 const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
 
 const persistor = persistStore(store)
+
 
 ReactDOM.render(
   <Provider store={store}>

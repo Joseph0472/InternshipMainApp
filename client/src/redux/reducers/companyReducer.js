@@ -92,8 +92,10 @@ export const saveCom = (userEmail) => async (dispatch, getState) => {
 export const saveExcelCom = (userEmail) => async (dispatch, getState) => {
     const companies = getState().company
     const index = companies.length - 1
+
     var comToSave = companies[index]
     comToSave.userEmail = userEmail
+
     //TODO: Companies with same name should be not allowed to add
     await fetch(config.serverUrl+"/api/company/", {
         method: "POST",
@@ -103,6 +105,7 @@ export const saveExcelCom = (userEmail) => async (dispatch, getState) => {
         body: JSON.stringify(comToSave)
     })
     //TODO: FIX the adding companies error when adding consecutively done
+
 
 }
 

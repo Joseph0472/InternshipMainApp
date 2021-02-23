@@ -42,6 +42,7 @@ export const deleteCom = (comList, index) => {
     }
 }
 
+
 export const updateCom = (ndata, tableID) => {
     return {
         type: UPDATE_COMPANY,

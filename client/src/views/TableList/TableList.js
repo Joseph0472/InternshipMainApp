@@ -331,6 +331,7 @@ export default function CompanyList() {
     // });
  }
 
+
  //TODO: From here, adjust the CRUD by adding a parameter. DONE
   const addCompany = (ndata, userEmail) => {
     var allowToAdd = true
@@ -346,12 +347,14 @@ export default function CompanyList() {
       setData([...data, ndata]);
     }
     dispatch(loadCom(auth.email))
+
   }
 
   const deleteCompany = (comList, index) => {
     dispatch(deleteCom(comList, index))
     dispatch(delCom(comList[index]._id))
     alert("Company removed.")
+
   }
 
   const updateCompany = (ndata, tableID) => {
@@ -493,6 +496,7 @@ export default function CompanyList() {
           new Promise((resolve, reject) => {
             setTimeout(() => {
               addCompany(newData, auth.email);
+
               resolve();
             }, 1000)
           }),

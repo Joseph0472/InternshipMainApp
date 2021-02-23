@@ -36,6 +36,8 @@
     "redux-thunk": "^2.3.0",
     "regression": "^2.0.1",
     "xlsx": "^0.16.9"
+    "redux-thunk": "^2.3.0"
+
   },
   "scripts": {
     "start": "react-scripts start",

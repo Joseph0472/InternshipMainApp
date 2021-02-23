@@ -9,6 +9,7 @@ const router = express.Router();
 COMPANY API
 ========================================================
 */
+
 //Getting all
 //TODO: directory issue in python DONE
 router.get('/company/', async (req, res) => {
@@ -270,6 +271,7 @@ async function getHis(req, res, next) {
     res.hisdata = hisdata
     next()
 }
+
 
 
 

@@ -28,3 +28,4 @@ PATCH  http://localhost:10000/api/company/601dc28f7633451e5ca4a5d1
 Content-Type: application/json
 
 {"companyName":"ob", "cPersonName":"asa"}
+
