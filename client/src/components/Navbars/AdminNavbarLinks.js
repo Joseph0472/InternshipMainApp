@@ -18,207 +18,154 @@ import Search from "@material-ui/icons/Search";
 // core components
 import CustomInput from "components/CustomInput/CustomInput.js";
 import Button from "components/CustomButtons/Button.js";
+import { useState, useEffect } from 'react';
 
-import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
+// import styles from "assets/jss/material-dashboard-react/components/headerLinksStyle.js";
+import { GoogleLogout } from 'react-google-login'
+import { GoogleLogin } from 'react-google-login';
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { logIn, logOut } from '../../redux/actions/authActions'
+import Grid from '@material-ui/core/Grid';
+import Alert from '@material-ui/lab/Alert';
+import { useHistory } from "react-router-dom";
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+const styles = {
+  root: {
+    width:330,
+    // height:
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItem: 'center',
+  },
+  paper: {
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItem: 'center',
+  },
+}
 
 const useStyles = makeStyles(styles);
 
 export default function AdminNavbarLinks() {
   const classes = useStyles();
-  const [openNotification, setOpenNotification] = React.useState(null);
-  const [openProfile, setOpenProfile] = React.useState(null);
-  const handleClickNotification = event => {
-    if (openNotification && openNotification.contains(event.target)) {
-      setOpenNotification(null);
-    } else {
-      setOpenNotification(event.currentTarget);
-    }
+  const dispatch = useDispatch();
+  let history = useHistory();
+
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  const state = useSelector((state) => state.auth)
+  const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(state)
+
+  const responseGoogle = async (response) => {
+    const profile = await response.getBasicProfile();
+    // Get Name
+    console.log(profile.getName())
+    // Get Img
+    console.log(profile.getImageUrl())
+    // Get Email
+    console.log(profile.getEmail())
+    setUser({
+      name: profile.getName(),
+      email: profile.getEmail(),
+      image: profile.getImageUrl(),
+    })
+  }
+
+  
+  const logout = () => {
+    setUser({name:"", email:"", image:""})
+    dispatch(logOut())
+    setIsAuthenticated(false)
+  }
+  //console.log("is authenticated? ",isAuthenticated)
+  useEffect(() => {
+    if(user.email) {
+      setIsAuthenticated(true)
+      dispatch(logIn({name: user.name, email: user.email, image: user.image}))
+    } else { setOpen(true) }
+  }, [user])
+
+  const handleClose = () => {
+    setOpen(false);
   };
-  const handleCloseNotification = () => {
-    setOpenNotification(null);
-  };
-  const handleClickProfile = event => {
-    if (openProfile && openProfile.contains(event.target)) {
-      setOpenProfile(null);
-    } else {
-      setOpenProfile(event.currentTarget);
-    }
-  };
-  const handleCloseProfile = () => {
-    setOpenProfile(null);
-  };
+
   return (
     <div>
-      <div className={classes.searchWrapper}>
-        <CustomInput
-          formControlProps={{
-            className: classes.margin + " " + classes.search
-          }}
-          inputProps={{
-            placeholder: "Search",
-            inputProps: {
-              "aria-label": "Search"
-            }
-          }}
-        />
-        <Button color="white" aria-label="edit" justIcon round>
-          <Search />
-        </Button>
-      </div>
-      <Button
-        color={window.innerWidth > 959 ? "transparent" : "white"}
-        justIcon={window.innerWidth > 959}
-        simple={!(window.innerWidth > 959)}
-        aria-label="Dashboard"
-        className={classes.buttonLink}
-      >
-        <Dashboard className={classes.icons} />
-        <Hidden mdUp implementation="css">
-          <p className={classes.linkText}>Dashboard</p>
-        </Hidden>
-      </Button>
-      <div className={classes.manager}>
-        <Button
-          color={window.innerWidth > 959 ? "transparent" : "white"}
-          justIcon={window.innerWidth > 959}
-          simple={!(window.innerWidth > 959)}
-          aria-owns={openNotification ? "notification-menu-list-grow" : null}
-          aria-haspopup="true"
-          onClick={handleClickNotification}
-          className={classes.buttonLink}
-        >
-          <Notifications className={classes.icons} />
-          <span className={classes.notifications}>5</span>
-          <Hidden mdUp implementation="css">
-            <p onClick={handleCloseNotification} className={classes.linkText}>
-              Notification
-            </p>
-          </Hidden>
-        </Button>
-        <Poppers
-          open={Boolean(openNotification)}
-          anchorEl={openNotification}
-          transition
-          disablePortal
-          className={
-            classNames({ [classes.popperClose]: !openNotification }) +
-            " " +
-            classes.popperNav
-          }
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              id="notification-menu-list-grow"
-              style={{
-                transformOrigin:
-                  placement === "bottom" ? "center top" : "center bottom"
-              }}
+
+        {isAuthenticated ? 
+          <div className={classes.root}>
+            <Grid
+  container
+  direction="row"
+  justify="center"
+  alignItems="center"
+  spacing={0}
+>
+            <Grid item xs className={classes.paper}>
+              Hello, {user.name}
+              </Grid>
+              <Grid item xs={2} className={classes.paper}>
+              <img src={user.image} style={{height: 40, width: 40, borderRadius: 50}}/>
+              </Grid>
+              <Grid item xs className={classes.paper}>
+              <GoogleLogout
+              buttonText="Logout"
+              clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
+              onLogoutSuccess={logout}
+              />
+              </Grid>
+              </Grid>
+            </div>
+            :
+            <div>
+            <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Welcome!"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Welcome to the internship opportunities forecasting app. Please login to begin~
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="primary">
+                Agree
+              </Button>
+            </DialogActions>
+          </Dialog>
+                          <Grid
+              container
+              direction="row"
+              justify="center"
+              alignItems="center"
             >
-              <Paper>
-                <ClickAwayListener onClickAway={handleCloseNotification}>
-                  <MenuList role="menu">
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Mike John responded to your email
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You have 5 new tasks
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      You{"'"}re now friend with Andrew
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another Notification
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseNotification}
-                      className={classes.dropdownItem}
-                    >
-                      Another One
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Poppers>
-      </div>
-      <div className={classes.manager}>
-        <Button
-          color={window.innerWidth > 959 ? "transparent" : "white"}
-          justIcon={window.innerWidth > 959}
-          simple={!(window.innerWidth > 959)}
-          aria-owns={openProfile ? "profile-menu-list-grow" : null}
-          aria-haspopup="true"
-          onClick={handleClickProfile}
-          className={classes.buttonLink}
-        >
-          <Person className={classes.icons} />
-          <Hidden mdUp implementation="css">
-            <p className={classes.linkText}>Profile</p>
-          </Hidden>
-        </Button>
-        <Poppers
-          open={Boolean(openProfile)}
-          anchorEl={openProfile}
-          transition
-          disablePortal
-          className={
-            classNames({ [classes.popperClose]: !openProfile }) +
-            " " +
-            classes.popperNav
-          }
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              id="profile-menu-list-grow"
-              style={{
-                transformOrigin:
-                  placement === "bottom" ? "center top" : "center bottom"
-              }}
-            >
-              <Paper>
-                <ClickAwayListener onClickAway={handleCloseProfile}>
-                  <MenuList role="menu">
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Profile
-                    </MenuItem>
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Settings
-                    </MenuItem>
-                    <Divider light />
-                    <MenuItem
-                      onClick={handleCloseProfile}
-                      className={classes.dropdownItem}
-                    >
-                      Logout
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Poppers>
-      </div>
+            <Grid item xs className={classes.paper}>
+            <Alert variant="outlined" severity="info">
+              Please Login to fetch your data
+            </Alert>
+              </Grid>
+              <Grid item xs className={classes.paper}>
+                <GoogleLogin
+                    clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
+                    buttonText="Login"
+                    onSuccess={responseGoogle}
+                    cookiePolicy={'single_host_origin'}
+                >Log in</GoogleLogin>
+              </Grid>
+            </Grid>    
+          </div>
+        }
     </div>
   );
 }

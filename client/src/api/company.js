@@ -11,7 +11,6 @@ import config from '../config'
 //   }
 
 const getAllCompany = () => {
-    console.log("hello")
     return fetch(config.serverUrl + "/api/company/").then(res => res.json());
   }
 
