@@ -25,7 +25,8 @@
     "heroku-postbuild": "npm run install-client && npm run build",
     "start": "node -r esm server.js",
     "server": "node server.js",
-    "client": "cd client && npm start"
+    "client": "cd client && npm start",
+    "start:dev": "nodemon --watch"
   },
   "eslintConfig": {
     "extends": [
