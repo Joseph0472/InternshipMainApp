@@ -21,8 +21,7 @@
   },
   "scripts": {
     "build": "cd client && npm run build",
-    "install-client": "cd client && npm install ",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm run install-client && npm run build",
+    "heroku-postbuild": "cd client && npm install && npm run build",
     "start": "node -r esm server.js",
     "server": "node server.js",
     "client": "cd client && npm start"
