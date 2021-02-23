@@ -1,7 +1,6 @@
 {
-  "name": "material-dashboard-react",
+  "name": "forecast-app",
   "version": "1.9.0",
-  "description": "Material Dashboard React. Coded by Creative Tim",
   "private": false,
   "proxy": "http://localhost:10000/",
   "main": "dist/index.js",
@@ -36,7 +35,6 @@
     "redux-thunk": "^2.3.0",
     "regression": "^2.0.1",
     "xlsx": "^0.16.9"
-    "redux-thunk": "^2.3.0"
 
   },
   "scripts": {
