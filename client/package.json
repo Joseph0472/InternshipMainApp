@@ -1,5 +1,6 @@
 {
-  "name": "forecast-app",
+  "name": "internship-project-g7",
+
   "version": "1.9.0",
   "private": false,
   "proxy": "http://localhost:5000/",
