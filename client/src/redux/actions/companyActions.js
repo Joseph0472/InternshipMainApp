@@ -1,16 +1,16 @@
 import {
-    LOAD_COMPANIES_LOADING,
-    LOAD_COMPANIES_SUCCESS,
-    LOAD_COMPANIES_ERROR,
+    ADD_COM_VIA_EXCEL,
     CREATE_COMPANY,
     SET_COMPANIES,
     DELETE_COMPANY,
+    UPDATE_COMPANY
 } from './action-types'
 
-export const addCom = (ndata) => {
+export const addCom = (ndata, uEmail) => {
     return {
         type: CREATE_COMPANY,
         payload: {
+            userEmail: uEmail,
             companyName: ndata.companyName,
             cPersonName: ndata.cPersonName,
             email: ndata.email,
@@ -42,11 +42,12 @@ export const deleteCom = (comList, index) => {
     }
 }
 
-export const updateCom = (ndata) => {
+
+export const updateCom = (ndata, tableID) => {
     return {
-        type: "UPDATE_COMPANY",
+        type: UPDATE_COMPANY,
         payload: {
-            index: ndata.tableData.id,
+            index: tableID,
             companyName: ndata.companyName,
             cPersonName: ndata.cPersonName,
             email: ndata.email,
@@ -61,24 +62,11 @@ export const updateCom = (ndata) => {
       }
 }
 
-// export const addComViaExcelFile
-
-export function loadCompaniesLoading() {
+export const addComViaExcelFile = (excelData) => {
     return {
-        type: LOAD_COMPANIES_LOADING
-    }
-}
-
-export function loadCompaniesSuccess(companies) {
-    return {
-        type: LOAD_COMPANIES_SUCCESS,
-        companies
-    }
-}
-
-export function loadCompaniesError(err) {
-    return {
-        type: LOAD_COMPANIES_ERROR,
-        err
+        type: ADD_COM_VIA_EXCEL,
+        payload: {
+            filedata: excelData
+          }
     }
 }

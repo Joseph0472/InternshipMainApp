@@ -61,7 +61,9 @@ const container = {
   paddingRight: "15px",
   paddingLeft: "15px",
   marginRight: "auto",
-  marginLeft: "auto"
+  marginLeft: "auto",
+  height:"50%",
+
 };
 
 const defaultFont = {
@@ -262,9 +264,15 @@ const cardLink = {
   }
 };
 
+const Image = {
+  maxWidth: "100%",
+  height: "auto"
+}
+
 export {
   hexToRgb,
   //variables
+  Image,
   drawerWidth,
   transition,
   container,

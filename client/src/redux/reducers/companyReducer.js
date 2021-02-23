@@ -1,13 +1,10 @@
 import {
-    LOAD_COMPANIES_LOADING,
-    LOAD_COMPANIES_SUCCESS,
-    LOAD_COMPANIES_ERROR,
     CREATE_COMPANY,
     SET_COMPANIES,
     DELETE_COMPANY,
-    UPDATE_COMPANY
+    UPDATE_COMPANY,
+    ADD_COM_VIA_EXCEL
 } from '../actions/action-types'
-import companyApi from '../../api/company'
 import config from '../../config'
 import { setCom } from '../actions/companyActions'
 
@@ -28,6 +25,7 @@ const companyReducer = (state = [], action) => {
     switch(type) {
         case CREATE_COMPANY:
             return [...state, {
+                userEmail: payload.userEmail,
                 companyName: payload.companyName,
                 cPersonName: payload.cPersonName,
                 email: payload.email,
@@ -47,8 +45,6 @@ const companyReducer = (state = [], action) => {
         case UPDATE_COMPANY:
             const dataUpdate = [...state];
             const index = payload.index;
-            console.log(payload) 
-            //console.log([...state][index])
             dataUpdate[index] = {
                 companyName: payload.companyName,
                 cPersonName: payload.cPersonName,
@@ -61,9 +57,8 @@ const companyReducer = (state = [], action) => {
                 interest3: payload.interest3,
             }
             return [...dataUpdate];
-        case "ADD_COM_VIA_EXCEL":
-            console.log("pl data: ", payload.filedata)
-            console.log("state: ", state)
+        case ADD_COM_VIA_EXCEL:
+            //console.log(state.push.apply(state,payload.filedata))
             return state.push.apply(state,payload.filedata);
         case SET_COMPANIES:
             // console.log("set company state:", state) //list of companies in db
@@ -71,12 +66,6 @@ const companyReducer = (state = [], action) => {
             // console.log(state)
             // console.log("return",[...state, action.payload])
             return action.payload
-        case LOAD_COMPANIES_LOADING:
-            return com_loading(state, action);
-        case LOAD_COMPANIES_SUCCESS:
-            return com_loaded(state, action);
-        case LOAD_COMPANIES_ERROR:
-            return com_loaderr(state, action)
         default: 
             return state
     }
@@ -84,53 +73,62 @@ const companyReducer = (state = [], action) => {
 
 export default companyReducer
 
-function com_loading(state, action) {
-    return state;
-}
-
-function com_loaded(state, action) {
-    var incoming = action.company
-    console.log(incoming)
-    return incoming
-}
-
-function com_loaderr(state, action) {
-    return state
-}
-
-export const saveCom = () => async (dispatch, getState) => {
+export const saveCom = (userEmail) => async (dispatch, getState) => {
     const companies = getState().company
     const index = companies.length - 1
-    console.log(companies)
+    var comToSave = companies[index]
+    comToSave.userEmail = userEmail
+    
+    await fetch(config.serverUrl+"/api/company/", {
+        method: "POST",
+        headers: {
+            "Content-type": 'application/json'
+        },
+        body: JSON.stringify(comToSave)
+    }).then(alert("Company added."))
+
+}
+
+export const saveExcelCom = (userEmail) => async (dispatch, getState) => {
+    const companies = getState().company
+    const index = companies.length - 1
+
+    var comToSave = companies[index]
+    comToSave.userEmail = userEmail
+
     //TODO: Companies with same name should be not allowed to add
     await fetch(config.serverUrl+"/api/company/", {
         method: "POST",
         headers: {
             "Content-type": 'application/json'
         },
-        body: JSON.stringify(companies[index])
-    }).then(alert("Company added."))
-    //TODO: FIX the adding companies error when adding consecutively
+        body: JSON.stringify(comToSave)
+    })
+    //TODO: FIX the adding companies error when adding consecutively done
+
 
 }
 
-export const loadCom = () => async (dispatch, getState) => {
+export const loadCom = (uEmail) => async (dispatch, getState) => {
     const companies = await fetch(config.serverUrl+"/api/company/").then(res => res.json())
-    console.log(companies)
-    dispatch(setCom(companies))
-    return companies
+    var myCompanies = []
+    companies.forEach(company => {
+        // When the company's userEmail can't match the param userEmail which is sent from frontend, don't load it DONE
+        if (company.userEmail === uEmail) {
+            myCompanies.push(company)
+        }        
+    });
+    dispatch(setCom(myCompanies))
+    return myCompanies
 }
 
 export const delCom = (id) => async (dispatch, getState) => {
-    // console.log("deleting id: ", id)
     fetch(config.serverUrl+"/api/company/"+id, {
         method: "DELETE"
-    }).then(alert("Company removed."))
-    //TODO: RELOAD the companies to maintain the new state DONE
+    })
 }
 
 export const upCom = (nrow) => async (dispatch, getState) => {
-    console.log("updating: ", nrow)
     await fetch(config.serverUrl+"/api/company/"+nrow._id, {
         method: "PATCH",
         headers: {
@@ -138,6 +136,18 @@ export const upCom = (nrow) => async (dispatch, getState) => {
         },
         body: JSON.stringify(nrow)
     }).then(alert("Company updated."))
-    //TODO: RELOAD the companies to maintain the new state DONE
 }
 
+export const deleteAllCom = (data, email) => async (dispatch, getState) => {
+    // data.forEach(com => {
+    //      fetch(config.serverUrl+"/api/company/"+com._id, {
+    //         method: "DELETE"
+    //     })
+    // });
+
+  await Promise.all(data.map(async (com) => {
+    await fetch(config.serverUrl+"/api/company/"+com._id, {
+        method: "DELETE"
+    })
+  }));
+}
