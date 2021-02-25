@@ -37,7 +37,9 @@ if (process.env.NODE_ENV === 'production') {
 
     // If we don't match ANYTHING else, return client/build/index.html on another GET request.
     app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+        res.sendFile(
+            path.sendFile(__dirname, 'client/build', 'index.html')
+            );
     });
 }
 
