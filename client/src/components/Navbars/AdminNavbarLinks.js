@@ -118,7 +118,7 @@ export default function AdminNavbarLinks() {
               <Grid item xs className={classes.paper}>
               <GoogleLogout
               buttonText="Logout"
-              clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
+              clientId="218982097035-djq18i6f4hnkurboasohm2djno5npl04.apps.googleusercontent.com"
               onLogoutSuccess={logout}
               />
               </Grid>
@@ -157,7 +157,7 @@ export default function AdminNavbarLinks() {
               </Grid>
               <Grid item xs className={classes.paper}>
                 <GoogleLogin
-                    clientId="218982097035-2fk50n7e831aaa6mdhmnqusl2ktbr0gj.apps.googleusercontent.com"
+                    clientId="218982097035-djq18i6f4hnkurboasohm2djno5npl04.apps.googleusercontent.com"
                     buttonText="Login"
                     onSuccess={responseGoogle}
                     cookiePolicy={'single_host_origin'}
