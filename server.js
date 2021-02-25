@@ -33,11 +33,14 @@ if (process.env.NODE_ENV === 'production') {
     console.log("Running in production!");
 
     // Make the "build" folder available statically
-    app.use('/admin/dashboard', express.static(path.join(__dirname, "client/build")));
+    app.use(express.static(path.join(__dirname, "client/build")));
 
     // If we don't match ANYTHING else, return client/build/index.html on another GET request.
     app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+        console.log("sth got")
+        res.sendFile(
+            path.resolve(__dirname, 'client/build', 'index.html')
+            );
     });
 }
 
