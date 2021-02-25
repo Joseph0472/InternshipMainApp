@@ -1,6 +1,6 @@
 {
   "name": "internship-project-g7",
-
+  "homepage": "https://young-temple-86859.herokuapp.com/",
   "version": "1.9.0",
   "private": false,
   "proxy": "http://localhost:10000/",
@@ -58,7 +58,6 @@
   "bugs": {
     "url": "https://github.com/creativetimofficial/material-dashboard-react/issues"
   },
-  "homepage": "https://creativetimofficial.github.io/material-dashboard-react/#/dashboard",
   "optionalDependencies": {
     "@types/googlemaps": "3.39.6",
     "@types/markerclustererplus": "2.1.33",
