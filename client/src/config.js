@@ -1,6 +1,6 @@
   
 var config = {
-    serverUrl : "http://localhost:10000"
+    serverUrl : ""
 }
 
 export default config
