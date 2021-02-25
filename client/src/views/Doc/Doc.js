@@ -150,9 +150,9 @@ export default function Doc() {
   * The application provides auto-save function once you may need to remove all data. Please save the backup.
   
   ## Download Link
-  *Companies information upload template* 
+  [Companies information upload template](https://github.com/Joseph0472/downloadcenter/raw/main/company-template.xlsx) 
   
-  *Students information upload template* 
+  [Students information upload template](https://github.com/Joseph0472/downloadcenter/raw/main/student-template.xlsx) 
   
   ## Guide to Download Trello Board .json File
   1. Find and click the "Menu" button in a trello board
@@ -160,7 +160,13 @@ export default function Doc() {
   3. Click "Print and export"
   4. Click "Export as JSON"
   5. In the new tab, right click and choose "save as ..."
-  6. Click save, now you can upload it in Company section and extract card name, list name, conversation info into Excel file`
+  6. Click save, now you can upload it in Company section by clicking "Get Conversation Info From Trello File"
+
+
+  *Special thanks to the support from Chris, Hayley and Yu-Cheng!*
+  
+  Contact: Joseph <jiangpeng0472@gmail.com>
+  `
 
   return (
     <Card>
