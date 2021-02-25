@@ -2,6 +2,7 @@
   "name": "server",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ancient-sea-46814.herokuapp.com/",
   "dependencies": {
     "@ramonak/react-excel": "^1.0.1",
     "@testing-library/user-event": "^12.1.10",
