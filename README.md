@@ -1,83 +1,60 @@
-# Getting Started with Create React App
+# Internship Information Management and Forecasting App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).check
 
-## Available Scripts
+## Background & Aim
+In ICT graduate school and business school, there would be a batch of graduates proceeding their internship each semester/academic period. Employer liaison managers usually face a circumstance full of change and uncertainty. To help them understand the situation and plan the work well, this application is built to provide information management and forecasting functions. 
 
-In the project directory, you can run:
+By importing data of companies and students, managers can easily know the total number of companies which should contact to and match students' interests with companies' interests well. Managers also can monitor the current situation by checking auto-generated summarized data. 
 
-### `yarn start`
+**NOTE: This is a personal version but not the deployed version, please ask for more info.**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## User Manual
+* Log in by Google account to start.
+* Upload Checklist:
+    1. Use the templete to edit information.
+    2. Ensure all cells are in the form "TEXT".
+    3. Double check if the file is correctly matches the destination (for example, company info excel should uploaded to company section).
+* Student name and company name should be unique, data with duplicated name would not allowed be created/updated. If you upload information with duplicated name, the new raw of data will replace the old one.
+* Due to the limit of Trello, only 1000 rows of actions would be saved in a board. That's also the upper limit we can handle.
+* When archive historical student-company number data, the name should be in this format: "year+semester".
+* The application provides auto-save function once you may need to remove all data. Please save the backup.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Download Link
+*Companies information upload template* 
 
-### `yarn test`
+*Students information upload template* 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Guide to Download Trello Board .json File
+1. Find and click the "Menu" button in a trello board
+2. Click "More"
+3. Click "Print and export"
+4. Click "Export as JSON"
+5. In the new tab, right click and choose "save as ..."
+6. Click save, now you can upload it in Company section and extract card name, list name, conversation info into Excel file
 
-### `yarn build`
+## Developer Manual
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The application adopted MERN stack.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Run:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### `npm install`
 
-### `yarn eject`
+in root directory and ./client to install dependencies in the server and client. Then, run:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### `npm start`
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+in both directory to boot the services.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Browser Support
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+At present, we officially aim to support the last two versions of the following browsers:
 
-## Learn More
+<img src="src/assets/github/chrome.png" width="64" height="64"/> <img src="src/assets/github/firefox.png" width="64" height="64"/> <img src="src/assets/github/edge.png" width="64" height="64"/> <img src="src/assets/github/safari.png" width="64" height="64"/> <img src="src/assets/github/opera.png" width="64" height="64"/>
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Licensing
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-
-Todos:
-MaterialTable ref: https://material-table.com/#/
-Add the full object to dispatch and reducer DONE
-Finish the other three dispatch function, DONE
-Duplicated them to student table, DONE
-Backend, DONE
-Dashboard modi, DONE
-DB...DONE
-Standarize structure Future...
-    //TODO: FIX the adding companies error when adding consecutively done
-    //TODO: Companies with same name should be not allowed to add done
-
+- Copyright 2020 Creative Tim (https://www.creative-tim.com)
+- Licensed under MIT (https://github.com/creativetimofficial/material-dashboard-react/blob/master/LICENSE.md)
+  
